@@ -1,7 +1,8 @@
-import jax
-import chex
-import jax.numpy as jnp
 from functools import partial
+
+import chex
+import jax
+import jax.numpy as jnp
 
 
 def _safe_div(numer: jnp.ndarray, denom: jnp.ndarray) -> jnp.ndarray:

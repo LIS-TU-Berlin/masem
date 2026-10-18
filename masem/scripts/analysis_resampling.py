@@ -1,23 +1,23 @@
 from dotenv import load_dotenv
+
 load_dotenv()
 
 import os
 from time import time
 
-import wandb
 import hydra
-import numpy as onp
 import jax.numpy as jnp
 import jax.random as jr
-from omegaconf import OmegaConf
+import numpy as onp
 import pandas as pd
+import wandb
+from masem.distributions.capsule_grasp_broken_fingers.capsule_grasp import CapsuleGrasp
+from omegaconf import OmegaConf
 from tqdm import tqdm
 
 from masem.constants import REPO_PATH
-from masem.utils import linear_project, reset_device_memory
 from masem.scripts.analysis_mcmc import setup
-
-from masem.distributions.capsule_grasp_broken_fingers.capsule_grasp import CapsuleGrasp
+from masem.utils import linear_project, reset_device_memory
 
 
 @hydra.main(config_path=str(REPO_PATH.parent / "configs"), config_name="base_cfg", version_base="1.2")

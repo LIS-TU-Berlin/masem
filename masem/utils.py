@@ -26,7 +26,7 @@ def linear_project(dist: ConstrainedDistribution, x: jnp.ndarray) -> jnp.ndarray
 def safe_norm(
     x: Array,
     min_norm: Numeric = 1e-12,
-    ord: Optional[Union[int, float, str]] = None,  # pylint: disable=redefined-builtin
+    norm_ord: Optional[Union[int, float, str]] = None,  # pylint: disable=redefined-builtin
     axis: Union[None, tuple[int, ...], int] = None,
     keepdims: bool = False,
 ) -> Array:
@@ -42,7 +42,7 @@ def safe_norm(
     Args:
     x: jax array.
     min_norm: lower bound for the returned norm.
-    ord: {non-zero int, inf, -inf, 'fro', 'nuc'}, optional. Order of the norm.
+    norm_ord: {non-zero int, inf, -inf, 'fro', 'nuc'}, optional. Order of the norm.
       inf means numpy's inf object. The default is None.
     axis: {None, int, 2-tuple of ints}, optional. If axis is an integer, it
       specifies the axis of x along which to compute the vector norms. If axis
@@ -57,10 +57,10 @@ def safe_norm(
     Returns:
     The safe norm of the input vector, accounting for correct gradient.
     """
-    norm = jnp.linalg.norm(x, ord=ord, axis=axis, keepdims=True)
+    norm = jnp.linalg.norm(x, ord=norm_ord, axis=axis, keepdims=True)
     x = jnp.where(norm <= min_norm, jnp.ones_like(x), x)
     norm = jnp.squeeze(norm, axis=axis) if not keepdims else norm
-    masked_norm = jnp.linalg.norm(x, ord=ord, axis=axis, keepdims=keepdims)
+    masked_norm = jnp.linalg.norm(x, ord=norm_ord, axis=axis, keepdims=keepdims)
     return jnp.where(norm <= min_norm, min_norm, masked_norm)
 
 
@@ -90,7 +90,7 @@ def extract_last_entry(dictionary: dict):
     for key, value in dictionary.items():
         try:
             last_entries[key] = value[-min(len(value), 1)]
-        except Exception as e:
+        except Exception:
             # print(f"Exception when extracting last entry for {key}: {e}")
             pass
     return last_entries
@@ -105,15 +105,13 @@ def reverse_transition_params(transition_params):
 
 
 def cmapper(name: str, cmap_name: str = "tab10"):
-    map = colormaps[cmap_name]
-
     match name:
         case "nhr":
             return "#D43244", ":", "NHR"
         case "knn_nhr":
             return "#D43244", "-", "MASEM-NHR (Ours)"
         case "cluster_nhr":
-            return map(5), "-.", "Cluster-NHR"
+            return colormaps[cmap_name](5), "-.", "Cluster-NHR"
         case "olla":
             return "purple", ":", "OLLA"
         case "knn_olla":
@@ -128,6 +126,7 @@ def cmapper(name: str, cmap_name: str = "tab10"):
 
 def seed_all(seed: int):
     import random
+
     import numpy as np
 
     # numpy
@@ -150,19 +149,29 @@ def get_dist(name: str, dim: int, *args, **kwargs):
             from masem.distributions.constrained.seven_lobes import SevenLobesUniform
             return SevenLobesUniform(dim=dim)
         case "disconnected_stress":
-            from masem.distributions.constrained.disconnected_stresstest import DisconnectedStress
+            from masem.distributions.constrained.disconnected_stresstest import (
+                DisconnectedStress,
+            )
             return DisconnectedStress(dim=dim, *args, **kwargs)
         case "disconnected_stress_2d":
-            from masem.distributions.constrained.disconnected_stresstest import DisconnectedStress
+            from masem.distributions.constrained.disconnected_stresstest import (
+                DisconnectedStress,
+            )
             return DisconnectedStress(dim=dim, *args, **kwargs)
         case "motion_planning_rand":
-            from masem.distributions.motion_planning.motion_planning import RandomObstacleMotionPlanning
+            from masem.distributions.motion_planning.motion_planning import (
+                RandomObstacleMotionPlanning,
+            )
             return RandomObstacleMotionPlanning(*args, **kwargs)
         case "motion_planning_grid":
-            from masem.distributions.motion_planning.motion_planning import GridObstacleMotionPlanning
+            from masem.distributions.motion_planning.motion_planning import (
+                GridObstacleMotionPlanning,
+            )
             return GridObstacleMotionPlanning(*args, **kwargs)
         case "sine":
-            from masem.distributions.constrained.growing_sine import GrowingSineDistribution
+            from masem.distributions.constrained.growing_sine import (
+                GrowingSineDistribution,
+            )
             return GrowingSineDistribution(*args, **kwargs)
         case "swiss_roll":
             from masem.distributions.constrained.swiss_roll import CircleSwissRoll

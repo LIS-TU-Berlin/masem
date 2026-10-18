@@ -29,7 +29,8 @@ class Sampler(ABC):
     def get_samples(self, state: BaseState):
         """Obtain samples from state.
 
-        Can be overwritten by methods that use parallel temp."""
+        Can be overwritten by methods that use parallel temp.
+        """
         return state.x
 
 

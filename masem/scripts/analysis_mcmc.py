@@ -1,23 +1,24 @@
 from dotenv import load_dotenv
+
 load_dotenv()
 
 import os
 from time import time
 
 import hydra
-import numpy as onp
 import jax.numpy as jnp
 import jax.random as jr
+import numpy as onp
+import pandas as pd
 import wandb
 from omegaconf import OmegaConf
-import pandas as pd
 from tqdm import tqdm
 
 from masem.constants import REPO_PATH
-from masem.eval.compute_metrics import get_metrics_fn
-from masem.utils import seed_all, linear_project, reset_device_memory
 from masem.distributions.constrained_dist import ConstrainedDistribution
+from masem.eval.compute_metrics import get_metrics_fn
 from masem.samplers.sampler import Sampler
+from masem.utils import linear_project, reset_device_memory, seed_all
 
 OmegaConf.register_new_resolver("eval", eval)
 
@@ -130,8 +131,6 @@ def sample_mcmc(cfg: OmegaConf):
         for i in tqdm(range(iters.shape[0]), colour="blue", desc="Upload"):
             mi = {k: v[i] if onp.ndim(v) > 0 else v for (k, v) in metrics.items()}
             wandb.log(mi, step=i)
-        
-
 
         # get auc for hparam tuning
         if "sd_proj" in metrics:

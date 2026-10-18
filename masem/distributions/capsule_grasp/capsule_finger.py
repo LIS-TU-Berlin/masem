@@ -72,11 +72,10 @@ class FingerConstraintBC(Constraint):
         cone_coeff: float,
         method: str
     ):
-        """Each finger is 6d and encodes x = (POA loc, POA force) \in R^6.
+        r"""Each finger is 6d and encodes x = (POA loc, POA force) \in R^6.
 
         The base or side contact is constraint to be XOR.
         """
-
         self.index = index
         self._is_equality = is_equality
         self.length = length

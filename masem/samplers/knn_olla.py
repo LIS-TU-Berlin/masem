@@ -1,13 +1,13 @@
 from functools import partial
-from typing import Tuple, Optional
+from typing import Optional, Tuple
 
 import jax
 import jax.numpy as jnp
 from blackjax.smc import resampling
 from chex import Array, PRNGKey, dataclass
 from jax import random
-from jaxopt import Bisection
 from jax.scipy.sparse.linalg import cg
+from jaxopt import Bisection
 
 from masem.distributions.constrained_dist import ConstrainedDistribution
 from masem.samplers.olla import OLLA, OLLAState

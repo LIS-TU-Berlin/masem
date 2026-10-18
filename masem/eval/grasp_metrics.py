@@ -2,7 +2,7 @@ from functools import partial
 
 import jax
 import jax.numpy as jnp
-from chex import Array, PRNGKey
+from chex import Array
 
 from masem.distributions.capsule_grasp.capsule_grasp import CapsuleGrasp
 from masem.distributions.constrained_dist import ConstrainedDistribution

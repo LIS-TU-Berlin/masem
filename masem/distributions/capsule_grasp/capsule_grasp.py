@@ -4,13 +4,15 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 from chex import Array
-from matplotlib.axes import Axes
 from jax.scipy.spatial.transform import Rotation
+from matplotlib.axes import Axes
 
+from masem.distributions.capsule_grasp.capsule_finger import (
+    create_capsule_finger_constraints,
+)
 from masem.distributions.constrained.halfspace import get_bound_contraints
 from masem.distributions.constrained_dist import ConstrainedDistribution
 from masem.distributions.constraint import Constraint, ConstraintSet
-from masem.distributions.capsule_grasp.capsule_finger import create_capsule_finger_constraints
 from masem.distributions.unconstrained.uniform import Uniform
 
 
@@ -255,7 +257,7 @@ class CapsuleGrasp(ConstrainedDistribution):
         fig.legend()
         if title is not None:
             ax.set_title(title)
-        
+
         ax = fig.add_subplot(122)
         # how many fingers are above, in or below the infeasible region?
         if samples is not None:
@@ -271,7 +273,7 @@ class CapsuleGrasp(ConstrainedDistribution):
             ax.set_xlabel("Axis position")
             ax.set_ylabel("Angle to capsule axis")
             ax.set_title("Finger positions relative to infeasible region")
-        
+
             print(f"Fraction of fingers in infeasible region: {jnp.mean(is_infeas):.2%}")
             print(f"Fraction of fingers above infeasible region: {jnp.mean(axis_pos > 0.125):.2%}")
             print(f"Fraction of fingers below infeasible region: {jnp.mean(axis_pos < -0.125):.2%}")

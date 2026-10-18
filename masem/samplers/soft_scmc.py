@@ -2,11 +2,11 @@ from functools import partial
 from typing import Optional
 
 import jax
-import jax.random as jr
 import jax.numpy as jnp
+import jax.random as jr
+from blackjax.smc import resampling
 from chex import Array, PRNGKey, dataclass
 from jaxopt import Bisection
-from blackjax.smc import resampling
 
 from masem.distributions.constrained_dist import ConstrainedDistribution
 from masem.samplers.sampler import Sampler
@@ -31,7 +31,7 @@ class ScmcState:
 
 
 class SoftSCMC(Sampler):
-    """SCMC implementation for Golchi et al (2016).
+    r"""SCMC implementation for Golchi et al (2016).
 
     Based on their R code:
     https://github.com/sgolchi/SCMC-/blob/master/SCMC.R
@@ -151,8 +151,7 @@ class SoftSCMC(Sampler):
         )
 
     def _gibbs_sample(self, rng: PRNGKey, state: ScmcState) -> ScmcState:
-        """
-        One full Metropolis-within-Gibbs sweep over all dimensions d=0..D-1,
+        """One full Metropolis-within-Gibbs sweep over all dimensions d=0..D-1,
         updating ALL particles in parallel for each dimension.
         """
         def update1d(d, carry):

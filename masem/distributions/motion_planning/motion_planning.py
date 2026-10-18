@@ -8,11 +8,13 @@ from matplotlib.axes import Axes
 
 from masem.distributions.constrained.halfspace import get_bound_contraints
 from masem.distributions.constrained_dist import ConstrainedDistribution
-from masem.distributions.constraint import ConstraintSet, Constraint
+from masem.distributions.constraint import Constraint, ConstraintSet
 from masem.distributions.distribution import Distribution
 from masem.distributions.motion_planning.bspline import BSpline
-from masem.distributions.motion_planning.collision_constraint import WaypointToPathConstraint, \
-    SphereCollisionConstraint
+from masem.distributions.motion_planning.collision_constraint import (
+    SphereCollisionConstraint,
+    WaypointToPathConstraint,
+)
 from masem.distributions.unconstrained.uniform import Uniform
 
 
@@ -111,8 +113,7 @@ class SosPathCost(Distribution):
 
 class DimEqConstraint(Constraint):
     def __init__(self, time_mask: Array, ndof: int, dim_idx: int, target_val: float):
-        """
-        time_maks: binary time idx at which the constraint should hold!
+        """time_maks: binary time idx at which the constraint should hold!
         dim_idx: dim idx at which constraint should hold
         ndof: number of dofs of the robot
         """
@@ -434,7 +435,7 @@ class MotionPlanning(ConstrainedDistribution):
 
     @partial(jax.jit, static_argnums=(0,))
     def path_signature(self, x: Array) -> Array:
-        """for each trajectory and obstacle compute whether it passes above or below"""
+        """For each trajectory and obstacle compute whether it passes above or below"""
         waypts = x.reshape(x.shape[0], -1, 2)
         knots = self.get_knots(waypts)
         paths = self.Phi @ knots
@@ -472,8 +473,8 @@ class MotionPlanning(ConstrainedDistribution):
         color_feasibility: bool = True,
         draw_obstacles=True
     ) -> Axes:
-        import numpy as onp
         import matplotlib.pyplot as plt
+        import numpy as onp
         from matplotlib.collections import LineCollection
         from matplotlib.patches import Circle
 
@@ -712,7 +713,7 @@ class RandomObstacleMotionPlanning(MotionPlanning):
         import matplotlib.pyplot as plt
         from matplotlib.patches import Circle
 
-        ax = kwargs.get("ax", None)
+        ax = kwargs.get("ax")
         if ax is None:
             _, ax = plt.subplots(1)
             kwargs["ax"] = ax

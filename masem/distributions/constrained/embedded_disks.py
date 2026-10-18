@@ -1,5 +1,4 @@
 from functools import partial
-from typing import Callable
 
 import jax
 import jax.numpy as jnp
@@ -9,12 +8,11 @@ from jax.nn import relu
 from matplotlib.axes import Axes
 
 from masem.constants import SAMPLE_PATH
+from masem.distributions.constrained.halfspace import get_bound_contraints
 from masem.distributions.constrained_dist import ConstrainedDistribution
 from masem.distributions.constraint import Constraint, ConstraintSet
 from masem.distributions.unconstrained.uniform import Uniform
-from masem.distributions.constrained.halfspace import get_bound_contraints
 from masem.utils import safe_norm
-
 
 # Safety factor applied to the empirical sup of the area element used as rejection envelope.
 ENVELOPE_SAFETY = 1.25
@@ -101,7 +99,7 @@ class EmbeddedDisksNonlinConst(Constraint):
                         minval=bounds[0], maxval=bounds[1])
         self.poly_coeffs = random.uniform(key_poly, (dim-2, degree + 1, 2), minval=-1.0, maxval=1.0)
         self.radius = radius
-    
+
     @partial(jax.jit, static_argnums=(0,))
     def _poly(self, x):
         # x: (n, 2)

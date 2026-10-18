@@ -1,5 +1,4 @@
-"""
-MIT License
+"""MIT License
 
 Copyright (c) 2025 Kijung Jeon
 2026 Cornelius Braun

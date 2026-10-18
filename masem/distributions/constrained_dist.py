@@ -1,10 +1,9 @@
+from functools import partial
 from typing import Optional
 
 import jax
 import jax.numpy as jnp
 from chex import Array, PRNGKey
-from functools import partial
-
 from jax.nn import relu
 from matplotlib.axes import Axes
 

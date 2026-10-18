@@ -8,8 +8,7 @@ def knn_log_radius_topk(
     eps: float = 1e-12,
     use_kmean: bool = True
 ) -> jax.Array:
-    """
-    x: (N, d)
+    """x: (N, d)
     Returns (N,) array where entry i is (1/k) * sum_{j=1..k} log r_j(x_i),
     with r_j the distance to the j-th nearest neighbor of x_i.
 

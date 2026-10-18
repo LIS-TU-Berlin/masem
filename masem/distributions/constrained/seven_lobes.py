@@ -27,15 +27,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from chex import Array, PRNGKey
 import jax
 import jax.numpy as jnp
 import jax.random as jr
+from chex import Array, PRNGKey
 
 from masem.constants import SAMPLE_PATH
 from masem.distributions.constrained.halfspace import get_bound_contraints
-from masem.distributions.constraint import Constraint, ConstraintSet
 from masem.distributions.constrained_dist import ConstrainedDistribution
+from masem.distributions.constraint import Constraint, ConstraintSet
 from masem.distributions.unconstrained.uniform import Uniform
 
 

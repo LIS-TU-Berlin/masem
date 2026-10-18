@@ -1,8 +1,8 @@
 from functools import partial
 
 import jax
-from chex import Array, PRNGKey
 import jax.numpy as jnp
+from chex import Array, PRNGKey
 from ott.geometry import pointcloud
 from ott.tools import sinkhorn_divergence as ott_sd
 from scipy.special import digamma, gammaln
@@ -61,7 +61,7 @@ def get_multi_k_ess(
     ks = onp.asarray(ks, dtype=int)
 
     def _knn_log_radii(pts: Array, valid_ks: Array) -> Array:
-        """kNN log-radius log-weights of `pts` for each k in `valid_ks`.
+        """KNN log-radius log-weights of `pts` for each k in `valid_ks`.
 
         Returns array of shape (n_pts, len(valid_ks)).
         """

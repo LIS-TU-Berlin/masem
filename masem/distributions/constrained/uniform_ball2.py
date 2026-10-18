@@ -1,3 +1,4 @@
+from functools import partial
 from typing import Optional
 
 import jax
@@ -5,8 +6,6 @@ import jax.numpy as jnp
 import jax.random as jr
 import jax.scipy as jsp
 import numpy as onp
-
-from functools import partial
 from chex import Array, PRNGKey
 from matplotlib.axes import Axes
 

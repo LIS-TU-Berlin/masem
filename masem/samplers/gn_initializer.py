@@ -1,9 +1,10 @@
 from functools import partial
+
 import jax
 import jax.numpy as jnp
 import jax.random as jr
-from jax.scipy.sparse.linalg import cg
 from chex import Array, PRNGKey
+from jax.scipy.sparse.linalg import cg
 
 from masem.distributions.constrained_dist import ConstrainedDistribution
 
@@ -32,7 +33,7 @@ class GaussNewtonInitializer:
     @partial(jax.jit, static_argnums=(0,))
     def initialize(self, rng: PRNGKey) -> Array:
         return jr.normal(rng, (self.n_chains, self.dist.dim)) * self.initial_scale
-    
+
     @partial(jax.jit, static_argnums=(0,))
     def _gauss_newton_step(self, rng: PRNGKey, x: Array) -> Array:
         x += jr.normal(rng, x.shape) * self.sigma
@@ -50,7 +51,7 @@ class GaussNewtonInitializer:
             1.0, self.step_max / (jnp.linalg.norm(step, keepdims=True) + self.tol)
         )
         return x + step
-    
+
     @partial(jax.jit, static_argnums=(0,))
     def step(self, rng: PRNGKey, x: Array) -> Array:
         rng = jr.split(rng, self.n_chains)

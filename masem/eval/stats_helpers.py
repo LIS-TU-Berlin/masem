@@ -2,8 +2,7 @@ from typing import Literal, Sequence
 
 import numpy as onp
 from chex import Array
-from scipy.stats import ttest_ind, trim_mean
-from scipy.stats import sem, bootstrap
+from scipy.stats import bootstrap, sem, trim_mean, ttest_ind
 
 
 def welch_pvalue(

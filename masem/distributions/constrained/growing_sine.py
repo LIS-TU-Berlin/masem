@@ -6,7 +6,10 @@ import jax.random as jr
 from chex import Array, PRNGKey
 
 from masem.constants import SAMPLE_PATH
-from masem.distributions.constrained.halfspace import get_bound_contraints, HalfspaceIneq
+from masem.distributions.constrained.halfspace import (
+    HalfspaceIneq,
+    get_bound_contraints,
+)
 from masem.distributions.constrained_dist import ConstrainedDistribution
 from masem.distributions.constraint import Constraint, ConstraintSet
 from masem.distributions.unconstrained.uniform import Uniform

@@ -73,6 +73,11 @@ ignore = [
     "B008", # Do not perform function calls in argument defaults
     #"B905", # `zip()` without an explicit `strict=` parameter
     "N813", # Allow renaming camel case classes on import
+    "B026",   # allow unsafe pattern Star-arg unpacking after a keyword argument
+    "N806",   # allow uppercase varnames for matrices
+    "N803",   # allow uppercase argnames for matrices
+    "E402",   # allow local imports despite Module level import not at top of file
+    "E731",          #lambda usage permission
 ]
 
 [tool.ruff.lint.pydocstyle]

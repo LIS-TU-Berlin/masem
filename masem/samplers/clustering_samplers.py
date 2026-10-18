@@ -9,7 +9,7 @@ from scipy.cluster.hierarchy import fcluster, linkage
 from scipy.spatial.distance import pdist
 
 from masem.distributions.constrained_dist import ConstrainedDistribution
-from masem.samplers.nhr import NHR, NhrState
+from masem.samplers.nhr import NHR
 from masem.samplers.sampler import ResamplingSampler
 from masem.types import Eval
 

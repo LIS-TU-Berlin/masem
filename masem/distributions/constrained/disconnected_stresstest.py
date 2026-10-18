@@ -608,8 +608,7 @@ class DisconnectedStress(ConstrainedDistribution):
 
     @partial(jax.jit, static_argnums=(0,))
     def component_kl_tv(self, samples: Array, true_weights: Array | None = None) -> tuple[Array, Array]:
-        """
-        KL(empirical || true) over component labels.
+        """KL(empirical || true) over component labels.
         For n_ineq == 0, true_weights defaults to analytic r_i^(p-1) weights.
         For n_ineq > 0, pass estimate_component_weights(...) as true_weights.
         """
