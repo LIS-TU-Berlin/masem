@@ -1,0 +1,39 @@
+name: motion_planning_rand
+dim: 2
+
+fn:
+  _target_: komino.distributions.motion_planning.motion_planning.RandomObstacleMotionPlanning
+
+nhr:
+  n_down: 500
+  max_step: 8.
+  max_ls_iters: 2
+  mu_slack: 1e3
+
+olla:
+  step_size: 5.e-4
+  alpha: 1000.0
+  n_hutch_samples: 0
+
+soft_scmc:
+  steps_per_level: 50
+  ess_target: 0.5
+  mu_min: 0.01
+
+knn_nhr:
+  knn_k: 8
+  knn_tau: 1.0
+  n_inner: 50
+  mu_slack: 1e2
+
+knn_olla:
+  knn_k: 4
+  knn_tau: 0.935
+  n_inner: 50
+  max_step: ${target.nhr.max_step}
+  mu_slack: 1e2
+
+cluster_nhr:
+  cluster_threshold: 0.14
+  n_inner: 10
+  mu_slack: 1e3

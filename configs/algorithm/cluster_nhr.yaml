@@ -1,0 +1,15 @@
+name: cluster_nhr
+
+fn:
+  _target_: komino.samplers.clustering_samplers.ClusterNhr
+  n_chains: ${eval_samples}
+  n_down: ${target.nhr.n_down}
+  max_ls_iters: ${target.nhr.max_ls_iters}
+  mu_slack: ${target.cluster_nhr.mu_slack}
+  slack_margin: 1e-3
+  max_step: ${target.nhr.max_step}
+
+  cluster_threshold: ${target.cluster_nhr.cluster_threshold}
+  n_inner: ${target.cluster_nhr.n_inner}
+
+n_iter: ${n_iter}

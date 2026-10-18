@@ -1,0 +1,10 @@
+name: soft_scmc
+
+fn:
+  _target_: komino.samplers.soft_scmc.SoftSCMC
+  n_chains: ${eval_samples}
+  steps_per_level: ${target.soft_scmc.steps_per_level}
+  ess_target: ${target.soft_scmc.ess_target}
+  mu_min: ${target.soft_scmc.mu_min}
+
+n_iter: ${n_iter}

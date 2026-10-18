@@ -1,0 +1,14 @@
+name: nhr
+
+fn:
+  _target_: komino.samplers.nhr.NHR
+  n_chains: ${eval_samples}
+  n_down: ${target.nhr.n_down}
+  max_ls_iters: ${target.nhr.max_ls_iters}
+  mu_slack: ${target.nhr.mu_slack}
+  slack_margin: 5e-3
+  max_step: ${target.nhr.max_step}
+
+resample_infeasible: True  # Whether to do a single resampling of infeasible particles after projection
+
+n_iter: ${n_iter}

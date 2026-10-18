@@ -1,0 +1,15 @@
+defaults:
+  - target: seven_lobes
+  - algorithm: nhr
+  - _self_
+
+result_dir: logs_rebuttal/${algorithm.name}_${target.name}_${target.dim}D_${seed}
+project_name: constrained_sampling
+visualize_samples: False
+save_samples: True
+
+seed: 0
+n_iter: 5000  # sampling iters
+eval_samples: 2000
+eval_every: 100
+allow_final_mixing: True # mixing after final iteration, to avoid ending close to resampling step.

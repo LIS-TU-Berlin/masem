@@ -1,0 +1,81 @@
+[project]
+name = "masem"
+version = "0.1.0"
+description = "Official code for 'Manifold Sampling via Entropy Maximization' paper from Braun, Burghoff & Toussaint, 2026."
+readme = "README.md"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "distrax>=0.1.7",
+    "flax>=0.12.2",
+    "hydra-core>=1.3.2",
+    "jax[cuda]==0.9.0",
+    "jupyterlab>=4.4.10",
+    "jupytext>=1.18.1",
+    "matplotlib>=3.10.7",
+    "notebook>=7.4.7",
+    "numpyro>=0.19.0",
+    "optax>=0.2.6",
+    "ott-jax>=0.6.0",
+    "pyqt6>=6.10.2",
+    "python-dotenv>=1.1.1",
+    "scienceplots>=2.2.0",
+    "scikit-learn>=1.7.2",
+    "tensorflow-probability>=0.25.0",
+    "tqdm>=4.67.1",
+    "wandb>=0.24.0",
+]
+
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["komino*"]
+
+[tool.mypy]
+show_error_codes = true
+disallow_incomplete_defs = true
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_return_any = true
+warn_unreachable = true
+
+[[tool.mypy.overrides]]
+module = "komino.*"
+disallow_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = "komino.*"
+ignore_errors = true
+
+[tool.black]
+line-length = 88        # PEP8
+
+[tool.ruff]
+line-length = 88        # PEP8
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "D", "A", "N", "B", "SIM", "C4", "TID"]
+ignore = [
+    #"F401", # Unused imports
+    "E741", # Ambiguous variable name
+    "D213", # Multi-line docstring summary should start at the second line
+    "D105", # Missing docstring in magic method
+    "D107", # Missing docstring in __init__
+    "D100",
+    "D101",
+    "D102",
+    "D103",
+    #"D203", # 1 blank line required before class docstring
+    #"D401", # First line should be in imperative mood; try rephrasing
+    #"D407", # Missing dashed underline after section
+    #"D406", # Section name should end with a newline
+    "D106", # Missing docstring in public nested class
+    "B006", # Do not use mutable data structures for argument defaults
+    "B008", # Do not perform function calls in argument defaults
+    #"B905", # `zip()` without an explicit `strict=` parameter
+    "N813", # Allow renaming camel case classes on import
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
