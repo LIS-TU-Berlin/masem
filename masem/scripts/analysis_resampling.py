@@ -11,10 +11,10 @@ import jax.random as jr
 import numpy as onp
 import pandas as pd
 import wandb
-from masem.distributions.capsule_grasp_broken_fingers.capsule_grasp import CapsuleGrasp
 from omegaconf import OmegaConf
 from tqdm import tqdm
 
+from masem.distributions.capsule_grasp.capsule_grasp import CapsuleGrasp
 from masem.constants import REPO_PATH
 from masem.scripts.analysis_mcmc import setup
 from masem.utils import linear_project, reset_device_memory

@@ -1,13 +1,11 @@
 from functools import partial
-from typing import Optional, Tuple
+from typing import Optional
 
 import jax
 import jax.numpy as jnp
 from blackjax.smc import resampling
-from chex import Array, PRNGKey, dataclass
-from jax import random
+from chex import Array, PRNGKey
 from jax.scipy.sparse.linalg import cg
-from jaxopt import Bisection
 
 from masem.distributions.constrained_dist import ConstrainedDistribution
 from masem.samplers.olla import OLLA, OLLAState
@@ -16,16 +14,7 @@ from masem.samplers.utils import knn_log_radius_topk
 from masem.types import Eval
 
 
-@dataclass
-class KnnOllaSmcState:
-    x: Array
-    ev: Eval
-    log_weights: Array
-    temperature: Array
-    step_count: int = 0
-
-
-class KnnOlla(OLLA, ResamplingSampler):
+class MasemOlla(OLLA, ResamplingSampler):
 
     def __init__(
         self,
@@ -145,129 +134,3 @@ class KnnOlla(OLLA, ResamplingSampler):
         x_new, ev_new = self._olla_step(rngs, state.x, state.ev)
         x_new = x_new.clip(*self.bounds)
         return state.replace(x=x_new, ev=ev_new, step_count=state.step_count + 1)
-
-
-class KnnOllaSmc(KnnOlla):
-    """Three-phase sampler: downhill → uniform coverage (OLLA) → SMC annealing (OLLA).
-
-    Phase 1 (external): projection_step drives particles to feasibility.
-    Phase 2 (step_count < n_uniform): OLLA at temperature=0 with kNN resampling.
-    Phase 3 (step_count >= n_uniform): SMC — geometric weight update + OLLA rejuvenation.
-    """
-
-    def __init__(
-        self,
-        target_dist: ConstrainedDistribution,
-        n_chains: int,
-        n_total: int,
-        step_size: float = 5e-4,
-        alpha: float = 2e3,
-        max_norm: float = 1e4,
-        proj_damp: float = 1e-6,
-        n_hutch_samples: int = 0,
-        knn_tau: float = 1.0,
-        knn_k: int = 10,
-        knn_eps: float = 1e-6,
-        resamp_freq: int = 50,
-        p_tau: float = 0.0,
-        max_step: float = 1.0,
-        n_uniform: int = 500,
-        ess_threshold: float = 0.5,
-        use_bisection: bool = False,
-        bisection_steps: int = 30,
-    ):
-        super().__init__(
-            target_dist, n_chains, step_size, alpha, max_norm,
-            proj_damp, n_hutch_samples, knn_tau, knn_k, knn_eps,
-            resamp_freq, p_tau, max_step,
-        )
-        self.n_uniform = n_uniform
-        n_smc_steps = n_total - n_uniform
-        self.delta_t = 1.0 / n_smc_steps
-        self.ess_threshold = ess_threshold
-        self.use_bisection = use_bisection
-        self.bisection_steps = bisection_steps
-        self.n_rejuv = resamp_freq
-
-    def initialize(self, rng: PRNGKey, initial_scale: float = 1.0) -> KnnOllaSmcState:
-        x0 = jax.random.normal(rng, (self.n_chains, self.dim)) * initial_scale
-        ev0 = jax.vmap(self.target_dist.eval)(x0)
-        return KnnOllaSmcState(
-            x=x0,
-            ev=ev0,
-            log_weights=jnp.zeros(self.n_chains),
-            temperature=0.,
-            step_count=0,
-        )
-
-    def resample(self, rng: PRNGKey, state: KnnOllaSmcState) -> KnnOllaSmcState:
-        resampled = super().resample(rng, state)
-        return resampled.replace(log_weights=jnp.zeros(self.n_chains))
-
-    def _ess_target_from_dt(self, log_weights: Array, base_logp: Array, dt: Array) -> Array:
-        log_w = log_weights + dt * base_logp
-        log_w_norm = log_w - jax.nn.logsumexp(log_w)
-        ess = 1.0 / jnp.sum(jnp.square(jnp.exp(log_w_norm)))
-        return ess - self.ess_threshold * self.n_chains
-
-    def _smc_step(
-        self,
-        rng: PRNGKey,
-        x: Array,
-        ev: Eval,
-        log_weights: Array,
-        temperature: Array,
-    ) -> Tuple[Array, Eval, Array, Array]:
-        """Advance temperature, accumulate IS weight, OLLA rejuvenation."""
-        delta_t_max = jnp.minimum(temperature + self.delta_t, 1.0) - temperature
-        base_logp = ev.base_logp.flatten()
-        if self.use_bisection:
-            ess_fn = lambda dt: self._ess_target_from_dt(log_weights, base_logp, dt)
-            delta_t = jax.lax.cond(
-                ess_fn(delta_t_max) >= 0.0,
-                lambda: delta_t_max,
-                lambda: Bisection(
-                    ess_fn, 0., delta_t_max,
-                    maxiter=self.bisection_steps, check_bracket=False,
-                ).run().params,
-            )
-        else:
-            delta_t = delta_t_max
-
-        t_new = temperature + delta_t
-        log_w_new = log_weights + delta_t * base_logp
-
-        rng_chains = jax.random.split(rng, self.n_chains)
-        x_new, ev_new = jax.vmap(
-            lambda rk, xi, evi: self._olla_step_one(rk, xi, evi, t_new)
-        )(rng_chains, x, ev)
-        return x_new.clip(*self.bounds), ev_new, log_w_new, t_new
-
-    @partial(jax.jit, static_argnames=("self",))
-    def step(self, rng: PRNGKey, state: KnnOllaSmcState) -> KnnOllaSmcState:
-        def do_uniform_olla(_):
-            rng_chains = random.split(rng, self.n_chains)
-            x_new, ev_new = jax.vmap(
-                lambda rk, xi, evi: self._olla_step_one(rk, xi, evi, 0.)
-            )(rng_chains, state.x, state.ev)
-            return state.replace(
-                x=x_new.clip(*self.bounds),
-                ev=ev_new,
-                step_count=state.step_count + 1,
-            )
-
-        def do_smc(_):
-            x_new, ev_new, log_w_new, t_new = self._smc_step(
-                rng, state.x, state.ev, state.log_weights, state.temperature,
-            )
-            return KnnOllaSmcState(
-                x=x_new, ev=ev_new, log_weights=log_w_new,
-                temperature=t_new, step_count=state.step_count + 1,
-            )
-
-        return jax.lax.cond(
-            state.step_count < self.n_uniform,
-            do_uniform_olla,
-            do_smc,
-            operand=None,
-        )

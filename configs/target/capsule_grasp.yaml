@@ -11,6 +11,7 @@ nhr:
   n_down: 500
   max_step: 5.4
   max_ls_iters: 4
+  mu_slack: 1e3
 
 cluster_nhr:
   cluster_threshold: 0.32
