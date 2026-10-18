@@ -1,7 +1,7 @@
 name: knn_nhr
 
 fn:
-  _target_: komino.samplers.knn_nhr.KnnNhr
+  _target_: masem.samplers.knn_nhr.KnnNhr
   n_chains: ${eval_samples}
   n_down: ${target.nhr.n_down}
   max_ls_iters: ${target.nhr.max_ls_iters}

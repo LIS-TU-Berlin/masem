@@ -3,7 +3,7 @@ dim: 18
 has_entropy: False
 
 fn:
-  _target_: komino.distributions.capsule_grasp.capsule_grasp.CapsuleGrasp
+  _target_: masem.distributions.capsule_grasp.capsule_grasp.CapsuleGrasp
   dim: ${target.dim}
 
 # algorithm-specific hyperparams

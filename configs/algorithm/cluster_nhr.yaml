@@ -1,7 +1,7 @@
 name: cluster_nhr
 
 fn:
-  _target_: komino.samplers.clustering_samplers.ClusterNhr
+  _target_: masem.samplers.clustering_samplers.ClusterNhr
   n_chains: ${eval_samples}
   n_down: ${target.nhr.n_down}
   max_ls_iters: ${target.nhr.max_ls_iters}

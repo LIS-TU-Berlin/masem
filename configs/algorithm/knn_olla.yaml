@@ -1,7 +1,7 @@
 name: knn_olla
 
 fn:
-  _target_: komino.samplers.knn_olla.KnnOlla
+  _target_: masem.samplers.knn_olla.KnnOlla
   n_chains: ${eval_samples}
   n_down: ${target.nhr.n_down}
   alpha: ${target.olla.alpha}

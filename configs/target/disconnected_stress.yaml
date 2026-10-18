@@ -5,7 +5,7 @@ has_entropy: False
 mu: 1e3
 
 fn:
-  _target_: komino.distributions.constrained.disconnected_stresstest.DisconnectedStress
+  _target_: masem.distributions.constrained.disconnected_stresstest.DisconnectedStress
   dim: ${target.dim}
   n_eq: 5
   n_ineq: 5

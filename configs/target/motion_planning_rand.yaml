@@ -2,7 +2,7 @@ name: motion_planning_rand
 dim: 2
 
 fn:
-  _target_: komino.distributions.motion_planning.motion_planning.RandomObstacleMotionPlanning
+  _target_: masem.distributions.motion_planning.motion_planning.RandomObstacleMotionPlanning
 
 nhr:
   n_down: 500

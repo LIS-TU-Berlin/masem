@@ -2,7 +2,7 @@ name: uniform_ball2_disconnected
 dim: 3
 
 fn:
-  _target_: komino.distributions.constrained.uniform_ball2.UniformBall2
+  _target_: masem.distributions.constrained.uniform_ball2.UniformBall2
   dim: ${target.dim}
   center_offset: 1.35
 

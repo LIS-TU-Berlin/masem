@@ -2,7 +2,7 @@ name: motion_planning_grid
 dim: 2
 
 fn:
-  _target_: komino.distributions.motion_planning.motion_planning.GridObstacleMotionPlanning
+  _target_: masem.distributions.motion_planning.motion_planning.GridObstacleMotionPlanning
 
 nhr:
   n_down: 500

@@ -3,7 +3,7 @@ dim: 2
 has_entropy: False
 
 fn:
-  _target_: komino.distributions.constrained.swiss_roll.CircleSwissRoll
+  _target_: masem.distributions.constrained.swiss_roll.CircleSwissRoll
 
 nhr:
   n_down: 500

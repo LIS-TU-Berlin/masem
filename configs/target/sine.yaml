@@ -3,7 +3,7 @@ dim: 2
 has_entropy: False
 
 fn:
-  _target_: komino.distributions.constrained.growing_sine.GrowingSineDistribution
+  _target_: masem.distributions.constrained.growing_sine.GrowingSineDistribution
 
 nhr:
   n_down: 500
