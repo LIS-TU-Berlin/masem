@@ -34,6 +34,9 @@
   .links a { display: inline-block; padding: 8px 16px; border-radius: 999px; border: 1px solid var(--line);
              background: var(--card); color: var(--fg); text-decoration: none; font-size: .95rem; }
   .links a:hover { border-color: var(--accent); color: var(--accent-ink); }
+  .links + .links { margin-top: 10px; }
+  .links a.ext::after { content: ""; display: inline-block; width: .8em; height: .8em; margin-left: 6px;
+                        vertical-align: -.05em; background: url(assets/external-link.svg) center / contain no-repeat; }
   h2 { font-size: 1.35rem; margin: 48px 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
   p { margin: 0 0 14px; }
   .lead { font-size: 1.05rem; }
@@ -42,6 +45,14 @@
   figure.teaser { margin-bottom: 44px; }
   figure.wide img { width: 100%; height: auto; display: block; border-radius: 10px; background: #fff; }
   figure.wide img.plot { padding: 14px 10px 8px; }
+  .with-samples { display: grid; gap: 12px; grid-template-columns: 1fr 3.4fr; align-items: center; }
+  figure.wide img.samples { padding: 14px; }
+  .scroll-x { overflow-x: auto; }
+  .mobile-only { display: none; }
+  @media (max-width: 600px) {
+    .scroll-x > * { min-width: 640px; }
+    .mobile-only { display: inline; }
+  }
   figcaption { color: var(--muted); font-size: .9rem; margin-top: 10px; }
   .step[data-t] { cursor: pointer; transition: border-color .2s, background .2s; }
   .step[data-t].active { border-color: var(--accent); background: var(--tint); }
@@ -75,8 +86,10 @@
             padding: 8px 12px; border-radius: 10px; background: #fff; color: #1d2126; font-size: .85rem; }
   .legend span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
   .legend svg { width: 30px; height: 10px; }
-  .pair { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
-  .pair img { width: 100%; height: auto; display: block; border-radius: 10px; background: #fff; padding: 8px; }
+  .plot-grid figure { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 10px; }
+  .plot-grid figcaption { margin-top: 6px; padding: 0 4px; }
+  .pair { display: grid; gap: 8px; grid-template-columns: 1fr 1fr; }
+  .pair img { width: 100%; height: auto; display: block; }
   .plot-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); margin-bottom: 16px; }
   @media (max-width: 480px) { .plot-grid { grid-template-columns: 1fr; } }
   .theorem { background: var(--tint); border: 1px solid var(--tint-line); border-left: 4px solid var(--accent);
@@ -92,7 +105,7 @@
   .problem-row { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; align-items: center; margin: 24px 0 40px; }
   .problem-row .problem { display: flex; flex-direction: column; gap: 12px; margin: 0; }
   .problem-row img, .problem-row video { width: 100%; height: auto; display: block; }
-  @media (max-width: 700px) { .problem-row { grid-template-columns: 1fr; } }
+  @media (max-width: 700px) { .problem-row { grid-template-columns: 1fr; } .problem-row figure { order: -1; } }
 </style>
 </head>
 <body>
@@ -103,13 +116,17 @@
   <p class="authors">Cornelius&nbsp;V.&nbsp;Braun<sup>*</sup> &middot; Tilman&nbsp;Burghoff<sup>*</sup> &middot; Marc&nbsp;Toussaint</p>
   <p class="affil">Technische Universit&auml;t Berlin &middot; Robotics Institute Germany<br>
   <span class="note">NeurIPS 2026 &middot; <sup>*</sup>Equal contribution, authors in alphabetical order</span></p>
-  <nav class="links">
-    <a href="https://arxiv.org/abs/2605.12338">Paper</a>
-    <a href="https://openreview.net/forum?id=mAVz31YJlN">OpenReview</a>
-    <a href="https://github.com/LIS-TU-Berlin/masem">Code</a>
-    <a href="#videos">Videos</a>
-    <a href="#results">Results</a>
-    <a href="#bibtex">BibTeX</a>
+  <nav>
+    <div class="links">
+      <a class="ext" href="https://arxiv.org/abs/2605.12338">Paper</a>
+      <a class="ext" href="https://openreview.net/forum?id=mAVz31YJlN">OpenReview</a>
+      <a class="ext" href="https://github.com/LIS-TU-Berlin/masem">Code</a>
+    </div>
+    <div class="links">
+      <a href="#videos">Videos</a>
+      <a href="#results">Results</a>
+      <a href="#bibtex">BibTeX</a>
+    </div>
   </nav>
 </header>
 
@@ -167,17 +184,17 @@
   the per-component sample mass \(\alpha_t\) toward the uniform (maximum-entropy) allocation \(\alpha^*\):</p>
   <div class="theorem-eq">\[D_{\mathrm{KL}}\big(p_{\alpha_t} \,\|\, p_{\alpha^*}\big) \le C_0 \Big(1 - \frac{\tau}{p}\Big)^{2t}\]</div>
   <p class="theorem-where">\(\tau \in (0, p)\): resampling temperature &middot; \(p\): intrinsic dimension of the manifold &middot;
-  \(t\): number of resampling steps. Reaching \(D_{\mathrm{KL}} \le \varepsilon\) takes
+  \(t\): number of resampling steps.</br >Reaching \(D_{\mathrm{KL}} \le \varepsilon\) takes
   \(\mathcal{O}\big((\log(1/\varepsilon) + \log\log N)/\tau\big)\) steps in the worst case, for \(N\) particles.</p>
 </div>
 <p>The resampling step is modular and adds only a small runtime overhead to the underlying sampler.</p>
 
 <h2 id="videos">Robotics samples</h2>
-<p class="note">Feasible samples drawn with MASEM on robotics problems. Videos loop; hover for controls.</p>
+<p class="note">Feasible samples drawn with MASEM on robotics problems.</p>
 <div class="grid" id="grid"></div>
 
 <h2 id="results">Results</h2>
-<p class="note">All curves show the mean and 95% confidence interval across seeds.</p>
+<p class="note">All curves show the mean and 95% confidence interval across seeds.<span class="mobile-only"> Swipe wide figures sideways to see all panels.</span></p>
 
 <h3>Strong sampling at low cost</h3>
 <p>Local samplers like NHR and OLLA cannot move mass between disconnected components, so they stall at
@@ -192,20 +209,25 @@ distance that is an order of magnitude lower, without increasing constraint viol
   <span><svg viewBox="0 0 30 10" aria-hidden="true"><line x1="1" y1="5" x2="29" y2="5" stroke="#800080" stroke-width="2.2"/></svg><b>MASEM-OLLA (ours)</b></span>
 </div>
 <figure class="wide">
-  <img class="plot" src="assets/results/convergence_uniform_ball2_disconnected.svg" alt="Sinkhorn distance, KL divergence and slack over 5000 iterations on the disconnected disks benchmark.">
-  <figcaption><strong>Disconnected disks.</strong> Sinkhorn distance \(\mathcal{W}_2^2\), KL divergence and
-  constraint slack over 5000 iterations.</figcaption>
+  <div class="scroll-x"><div class="with-samples">
+    <img class="samples" src="assets/results/samples_uniform_ball2_disconnected.png" alt="MASEM-NHR samples on the disconnected disks benchmark.">
+    <img class="plot" src="assets/results/convergence_uniform_ball2_disconnected.svg" alt="Sinkhorn distance, KL divergence and slack over 5000 iterations on the disconnected disks benchmark.">
+  </div></div>
+  <figcaption><strong>Disconnected disks.</strong> MASEM-NHR samples, and Sinkhorn distance \(\mathcal{W}_2^2\), KL divergence and
+  constraint violations over 5000 iterations.</figcaption>
 </figure>
 <figure class="wide">
-  <img class="plot" src="assets/results/convergence_sine.svg" alt="Sinkhorn distance, KL divergence and slack over 5000 iterations on the sine benchmark.">
-  <figcaption><strong>Sine.</strong> Same metrics on the sine benchmark, where the equality constraint and the
-  feasible region together split the curve into disconnected segments.</figcaption>
+  <div class="scroll-x"><div class="with-samples">
+    <img class="samples" src="assets/results/samples_sine.png" alt="MASEM-NHR samples on the sine benchmark.">
+    <img class="plot" src="assets/results/convergence_sine.svg" alt="Sinkhorn distance, KL divergence and slack over 5000 iterations on the sine benchmark.">
+  </div></div>
+  <figcaption><strong>Sine.</strong> MASEM-NHR samples, and Sinkhorn distance \(\mathcal{W}_2^2\), KL divergence and
+  constraint violations over 5000 iterations.</figcaption>
 </figure>
 
 <h3>Scaling with dimension</h3>
-<p>On a stress test with disconnected components (\(l = |C| = 5\)), MASEM achieves the lowest Sinkhorn
-distance as the dimension \(d\) grows. It also stays competitive in wallclock time with the other
-samplers that evaluate the constraint Jacobian.</p>
+<p>On a stress test with five disconnected components, MASEM achieves the lowest Sinkhorn
+distance as the dimension \(d\) grows. It also stays competitive in wallclock time with the baselines.</p>
 <div class="legend" aria-label="Legend">
   <span><svg viewBox="0 0 30 10" aria-hidden="true"><line x1="1" y1="5" x2="29" y2="5" stroke="#d4324a" stroke-width="2.2" stroke-dasharray="1.5 2.5"/></svg>NHR</span>
   <span><svg viewBox="0 0 30 10" aria-hidden="true"><line x1="1" y1="5" x2="29" y2="5" stroke="#800080" stroke-width="2.2" stroke-dasharray="1.5 2.5"/></svg>OLLA</span>
@@ -228,8 +250,7 @@ samplers that evaluate the constraint Jacobian.</p>
       <img src="assets/results/disconnected_stress_sd_proj.svg" alt="Sinkhorn distance versus dimension with an increasing manifold dimension.">
       <img src="assets/results/disconnected_stress_wallclock.svg" alt="Wallclock time versus dimension with an increasing manifold dimension.">
     </div>
-    <figcaption><strong>Increasing manifold dimension.</strong> With fixed numbers of constraints
-    (\(m = l = 5\)), MASEM outperforms NHR, OLLA and Cluster-NHR by an order of magnitude.</figcaption>
+    <figcaption><strong>Increasing manifold dimension.</strong> Using a intrinsic manifold dimension of \(d-5\), MASEM outperforms NHR, OLLA and Cluster-NHR by an order of magnitude.</figcaption>
   </figure>
 </div>
 
@@ -239,12 +260,10 @@ Without ground-truth samples, we report the feasible entropy and the entropy ove
 MASEM reaches the highest feasible entropy and covers more homotopy classes, i.e. more distinct
 routes through the obstacles.</p>
 <figure class="wide">
-  <img class="plot" src="assets/results/masem-mp-rand.svg" alt="50 sampled trajectories per method on the random-obstacle motion planning problem.">
+  <div class="scroll-x"><img class="plot" src="assets/results/masem-mp-rand.svg" alt="50 sampled trajectories per method on the random-obstacle motion planning problem."></div>
   <figcaption><strong>Random obstacles, 50 samples per method.</strong> MASEM-based approaches yield the
   highest sample entropy of all methods.</figcaption>
 </figure>
-<figure class="wide">
-  <img class="plot" src="assets/results/convergence_motion_planning_rand.svg" alt="Feasible entropy, homotopy entropy, slack and wallclock over iterations on the random-obstacle motion planning problem.">
 <div class="legend" aria-label="Legend">
   <span><svg viewBox="0 0 30 10" aria-hidden="true"><line x1="1" y1="5" x2="29" y2="5" stroke="#d4324a" stroke-width="2.2" stroke-dasharray="1.5 2.5"/></svg>NHR</span>
   <span><svg viewBox="0 0 30 10" aria-hidden="true"><line x1="1" y1="5" x2="29" y2="5" stroke="#800080" stroke-width="2.2" stroke-dasharray="1.5 2.5"/></svg>OLLA</span>
@@ -253,8 +272,10 @@ routes through the obstacles.</p>
   <span><svg viewBox="0 0 30 10" aria-hidden="true"><line x1="1" y1="5" x2="29" y2="5" stroke="#d4324a" stroke-width="2.2"/></svg><b>MASEM-NHR (ours)</b></span>
   <span><svg viewBox="0 0 30 10" aria-hidden="true"><line x1="1" y1="5" x2="29" y2="5" stroke="#800080" stroke-width="2.2"/></svg><b>MASEM-OLLA (ours)</b></span>
 </div>
+<figure class="wide">
+  <div class="scroll-x"><img class="plot" src="assets/results/convergence_motion_planning_rand.svg" alt="Feasible entropy, homotopy entropy, slack and wallclock over iterations on the random-obstacle motion planning problem."></div>
   <figcaption><strong>Random obstacles</strong> (9 dimensions, 934 constraints). Feasible entropy, homotopy-class entropy,
-  slack and wallclock time.</figcaption>
+  constraint violation and wallclock time.</figcaption>
 </figure>
 
 <h2 id="paper">Paper</h2>
