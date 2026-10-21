@@ -43,7 +43,7 @@
   figure { margin: 0; }
   figure.wide { margin-bottom: 16px; }
   figure.teaser { margin-bottom: 44px; }
-  figure.wide img { width: 100%; height: auto; display: block; border-radius: 10px; background: #fff; }
+  figure.wide img { width: 100%; height: auto; display: block; border-radius: 10px; background: #fff; border: 1px solid var(--line); }
   figure.wide img.plot { padding: 14px 10px 8px; }
   .with-samples { display: grid; gap: 12px; grid-template-columns: 1fr 3.4fr; align-items: center; }
   figure.wide img.samples { padding: 14px; }
@@ -56,7 +56,7 @@
   figcaption { color: var(--muted); font-size: .9rem; margin-top: 10px; }
   .step[data-t] { cursor: pointer; transition: border-color .2s, background .2s; }
   .step[data-t].active { border-color: var(--accent); background: var(--tint); }
-  .repeat { display: flex; flex-direction: column; gap: 10px; padding: 10px; border: 1px dashed var(--accent); border-radius: 12px; }
+  .repeat { display: flex; flex-direction: column; gap: 10px; padding: 10px; border: 1px dashed var(--accent); border-radius: 10px; }
   .repeat-label { background: var(--tint); border: 1px solid var(--tint-line); border-radius: 10px; padding: 6px 14px;
                   text-align: center; font-weight: 700; color: var(--accent-ink); }
   .step { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; font-size: .95rem; }
@@ -64,7 +64,7 @@
   .eq { font-family: var(--mono); font-size: .9rem; background: var(--card); border: 1px solid var(--line);
         border-radius: 10px; padding: 12px 14px; overflow-x: auto; margin: 10px 0 16px; }
   .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
-  .grid figure { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .grid figure { background: var(--card); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
   .grid video { width: 100%; display: block; background: #fff; aspect-ratio: 16 / 9; object-fit: contain; }
   .grid figcaption { padding: 9px 12px 11px; margin: 0; }
   @media (max-width: 400px) { .grid { grid-template-columns: 1fr; } }
@@ -83,10 +83,10 @@
   .bibtex button:hover { border-color: var(--accent); color: var(--accent-ink); }
   h3 { font-size: 1.08rem; margin: 30px 0 8px; }
   .legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; margin: 4px 0 8px;
-            padding: 8px 12px; border-radius: 10px; background: #fff; color: #1d2126; font-size: .85rem; }
+            padding: 8px 12px; border-radius: 10px; color: #1d2126; font-size: .85rem; }
   .legend span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
   .legend svg { width: 30px; height: 10px; }
-  .plot-grid figure { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 10px; }
+  .plot-grid figure { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 10px; }
   .plot-grid figcaption { margin-top: 6px; padding: 0 4px; }
   .pair { display: grid; gap: 8px; grid-template-columns: 1fr 1fr; }
   .pair img { width: 100%; height: auto; display: block; }
@@ -105,6 +105,7 @@
   .problem-row { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; align-items: center; margin: 24px 0 40px; }
   .problem-row .problem { display: flex; flex-direction: column; gap: 12px; margin: 0; }
   .problem-row img, .problem-row video { width: 100%; height: auto; display: block; }
+  .problem-row video { border-radius: 10px; border: 1px solid var(--line); background: #fff; }
   @media (max-width: 700px) { .problem-row { grid-template-columns: 1fr; } .problem-row figure { order: -1; } }
 </style>
 </head>
@@ -134,11 +135,11 @@
   <img src="assets/2d_rows_transposed.png" alt="Samples from MASEM-NHR (top row) and ground truth (bottom row) on five 2D benchmarks: connected disks, disconnected disks, seven lobes, sine and swiss roll.">
   <figcaption><strong>MASEM-NHR vs. ground truth on 2D benchmarks.</strong> Black lines show equality
   constraints, green shaded areas the feasible region of the inequality constraints. MASEM allocates
-  sample mass uniformly across disconnected components and along highly curved manifolds.</figcaption>
+  sample mass uniformly across disconnected components and along high-curvature manifolds.</figcaption>
 </figure>
 
 <section>
-  <p class="lead">Sampling from distributions on implicitly defined manifolds: Prior work assumes that the feasible set is connected, but in practice it often decomposes into multiple disconnected components. We propose
+  <p class="lead">Sampling from distributions on implicitly defined manifolds: prior work assumes that the feasible set is connected, but in practice it often decomposes into multiple disconnected components. We propose
   <strong>MAnifold Sampling via Entropy Maximization (MASEM)</strong> which uses a resampling scheme that maximizes the entropy of the empirical distribution based on \(k\)-nearest-neighbor density estimation, and improves over alternatives by an order of
   magnitude in Sinkhorn distance with competitive runtime.</p>
 </section>
@@ -184,7 +185,7 @@
   the per-component sample mass \(\alpha_t\) toward the uniform (maximum-entropy) allocation \(\alpha^*\):</p>
   <div class="theorem-eq">\[D_{\mathrm{KL}}\big(p_{\alpha_t} \,\|\, p_{\alpha^*}\big) \le C_0 \Big(1 - \frac{\tau}{p}\Big)^{2t}\]</div>
   <p class="theorem-where">\(\tau \in (0, p)\): resampling temperature &middot; \(p\): intrinsic dimension of the manifold &middot;
-  \(t\): number of resampling steps.</br >Reaching \(D_{\mathrm{KL}} \le \varepsilon\) takes
+  \(t\): number of resampling steps.<br>Reaching \(D_{\mathrm{KL}} \le \varepsilon\) takes
   \(\mathcal{O}\big((\log(1/\varepsilon) + \log\log N)/\tau\big)\) steps in the worst case, for \(N\) particles.</p>
 </div>
 <p>The resampling step is modular and adds only a small runtime overhead to the underlying sampler.</p>
@@ -211,7 +212,7 @@ distance that is an order of magnitude lower, without increasing constraint viol
 <figure class="wide">
   <div class="scroll-x"><div class="with-samples">
     <img class="samples" src="assets/results/samples_uniform_ball2_disconnected.png" alt="MASEM-NHR samples on the disconnected disks benchmark.">
-    <img class="plot" src="assets/results/convergence_uniform_ball2_disconnected.svg" alt="Sinkhorn distance, KL divergence and slack over 5000 iterations on the disconnected disks benchmark.">
+    <img class="plot" src="assets/results/convergence_uniform_ball2_disconnected.svg" alt="Sinkhorn distance, KL divergence and constraint violations over 5000 iterations on the disconnected disks benchmark.">
   </div></div>
   <figcaption><strong>Disconnected disks.</strong> MASEM-NHR samples, and Sinkhorn distance \(\mathcal{W}_2^2\), KL divergence and
   constraint violations over 5000 iterations.</figcaption>
@@ -219,7 +220,7 @@ distance that is an order of magnitude lower, without increasing constraint viol
 <figure class="wide">
   <div class="scroll-x"><div class="with-samples">
     <img class="samples" src="assets/results/samples_sine.png" alt="MASEM-NHR samples on the sine benchmark.">
-    <img class="plot" src="assets/results/convergence_sine.svg" alt="Sinkhorn distance, KL divergence and slack over 5000 iterations on the sine benchmark.">
+    <img class="plot" src="assets/results/convergence_sine.svg" alt="Sinkhorn distance, KL divergence and constraint violations over 5000 iterations on the sine benchmark.">
   </div></div>
   <figcaption><strong>Sine.</strong> MASEM-NHR samples, and Sinkhorn distance \(\mathcal{W}_2^2\), KL divergence and
   constraint violations over 5000 iterations.</figcaption>
@@ -250,7 +251,7 @@ distance as the dimension \(d\) grows. It also stays competitive in wallclock ti
       <img src="assets/results/disconnected_stress_sd_proj.svg" alt="Sinkhorn distance versus dimension with an increasing manifold dimension.">
       <img src="assets/results/disconnected_stress_wallclock.svg" alt="Wallclock time versus dimension with an increasing manifold dimension.">
     </div>
-    <figcaption><strong>Increasing manifold dimension.</strong> Using a intrinsic manifold dimension of \(d-5\), MASEM outperforms NHR, OLLA and Cluster-NHR by an order of magnitude.</figcaption>
+    <figcaption><strong>Increasing manifold dimension.</strong> Using an intrinsic manifold dimension of \(d-5\), MASEM outperforms NHR, OLLA and Cluster-NHR by an order of magnitude.</figcaption>
   </figure>
 </div>
 
@@ -273,14 +274,14 @@ routes through the obstacles.</p>
   <span><svg viewBox="0 0 30 10" aria-hidden="true"><line x1="1" y1="5" x2="29" y2="5" stroke="#800080" stroke-width="2.2"/></svg><b>MASEM-OLLA (ours)</b></span>
 </div>
 <figure class="wide">
-  <div class="scroll-x"><img class="plot" src="assets/results/convergence_motion_planning_rand.svg" alt="Feasible entropy, homotopy entropy, slack and wallclock over iterations on the random-obstacle motion planning problem."></div>
+  <div class="scroll-x"><img class="plot" src="assets/results/convergence_motion_planning_rand.svg" alt="Feasible entropy, homotopy entropy, constraint violations and wallclock over iterations on the random-obstacle motion planning problem."></div>
   <figcaption><strong>Random obstacles</strong> (9 dimensions, 934 constraints). Feasible entropy, homotopy-class entropy,
   constraint violation and wallclock time.</figcaption>
 </figure>
 
 <h2 id="paper">Paper</h2>
 <p><a href="https://arxiv.org/abs/2605.12338">Manifold Sampling via Entropy Maximization</a>.
-Cornelius V. Braun, Tilman Burghoff, Marc Toussaint. NeurIPS 2026.
+Cornelius V. Braun, Tilman Burghoff, Marc Toussaint. NeurIPS 2026.<br>
 [<a href="https://arxiv.org/pdf/2605.12338">PDF</a>] [<a href="https://openreview.net/forum?id=mAVz31YJlN">OpenReview</a>]</p>
 <p id="bibtex">If you find this work useful, please cite:</p>
 <div class="bibtex">
@@ -305,7 +306,7 @@ Website design adapted from the <a href="https://denisbless.github.io/FFM_websit
   const ITEMS = [
     ["grasps.mp4",        "Grasp poses",      "robot arm grasp configurations"],
     ["paths.mp4",         "Motion paths",     "end-effector paths through an obstacle course"],
-    ["mppi_24_front.mp4", "Humanoid poses",   "whole-body humanoid configurations"],
+    ["mppi_24_front.mp4", "Humanoid poses",   "stable humanoid handstand configurations"],
     ["twister.mp4",       "Twister",          "multi-limb contact configurations on a Twister mat"],
   ];
   const grid = document.getElementById("grid");
