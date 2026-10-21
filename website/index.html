@@ -43,7 +43,11 @@
   figure.wide img { width: 100%; height: auto; display: block; border-radius: 10px; background: #fff; }
   figure.wide img.plot { padding: 14px 10px 8px; }
   figcaption { color: var(--muted); font-size: .9rem; margin-top: 10px; }
-  .steps { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin: 18px 0 6px; }
+  .step[data-t] { cursor: pointer; transition: border-color .2s, background .2s; }
+  .step[data-t].active { border-color: var(--accent); background: var(--tint); }
+  .repeat { display: flex; flex-direction: column; gap: 10px; padding: 10px; border: 1px dashed var(--accent); border-radius: 12px; }
+  .repeat-label { background: var(--tint); border: 1px solid var(--tint-line); border-radius: 10px; padding: 6px 14px;
+                  text-align: center; font-weight: 700; color: var(--accent-ink); }
   .step { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; font-size: .95rem; }
   .step b { color: var(--accent-ink); display: block; margin-bottom: 4px; }
   .eq { font-family: var(--mono); font-size: .9rem; background: var(--card); border: 1px solid var(--line);
@@ -84,9 +88,10 @@
   .eq .katex-display, .theorem-eq .katex-display { margin: .4em 0; }
   .theorem-where { color: var(--muted); font-size: .9rem; }
   .problem .eq { margin: 8px 0 2px; }
+  .problem .note { margin: 0; }
   .problem-row { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; align-items: center; margin: 24px 0 40px; }
   .problem-row .problem { display: flex; flex-direction: column; gap: 12px; margin: 0; }
-  .problem-row img { width: 100%; height: auto; display: block; }
+  .problem-row img, .problem-row video { width: 100%; height: auto; display: block; }
   @media (max-width: 700px) { .problem-row { grid-template-columns: 1fr; } }
 </style>
 </head>
@@ -136,15 +141,24 @@
   </figure>
 </div>
 <p>MASEM solves this by adding an entropy-maximizing resampling step to any local constrained sampler:</p>
-<div class="steps">
-  <div class="step"><b>1 &middot; Project</b> Random initial samples are projected onto the manifold
-    with Gauss-Newton steps on the squared constraint violation.</div>
-  <div class="step"><b>2 &middot; Mix</b> A local constrained MCMC kernel, e.g. non-linear
-    Hit-and-Run (NHR) or OLLA, mixes the samples within each component.</div>
-  <div class="step"><b>3 &middot; Estimate</b> A \(k\)-nearest-neighbor estimate of the sample density
-    gives samples in under-represented regions higher weights.</div>
-  <div class="step"><b>4 &middot; Resample</b> Resampling by these weights moves mass toward a
-    uniform allocation across components. Steps 2&ndash;4 repeat.</div>
+<div class="problem-row">
+  <div class="problem">
+    <div class="step" data-t="0"><b>1 &middot; Project</b> Random initial samples are projected onto the manifold
+      with Gauss-Newton steps on the squared constraint violation.</div>
+    <div class="step" data-t="1.5"><b>2 &middot; Mix</b> A local constrained MCMC kernel, e.g. non-linear
+      Hit-and-Run (NHR) or OLLA, mixes the samples within each component.</div>
+    <div class="repeat">
+      <div class="repeat-label">&#8635; Repeat</div>
+      <div class="step" data-t="4.9"><b>3a &middot; Resample</b> A \(k\)-nearest-neighbor estimate of the sample density
+        gives samples in under-represented regions higher weights. Resampling by these weights moves
+        mass toward a uniform allocation across components.</div>
+      <div class="step" data-t="8.2"><b>3b &middot; Mix</b> The local kernel mixes the resampled samples within
+        each component again.</div>
+    </div>
+  </div>
+  <figure>
+    <video id="framework" src="assets/masem-framework.mp4" autoplay loop muted playsinline aria-label="Animation of MASEM on two disconnected disks: samples are projected onto the manifold, mixed with a local kernel, then repeatedly resampled by kNN distance and mixed again until both components are covered uniformly."></video>
+  </figure>
 </div>
 <div class="theorem">
   <div class="theorem-title">Theorem (simplified)</div>
@@ -285,6 +299,16 @@ Website design adapted from the <a href="https://denisbless.github.io/FFM_websit
     fig.appendChild(cap);
     grid.appendChild(fig);
   }
+
+  // Highlight the method step the framework animation is currently showing; clicking a step seeks to it.
+  const framework = document.getElementById("framework");
+  const steps = [...document.querySelectorAll(".step[data-t]")];
+  (function sync() {
+    const cur = steps.findLast(s => framework.currentTime >= +s.dataset.t);
+    for (const s of steps) s.classList.toggle("active", s === cur);
+    requestAnimationFrame(sync);
+  })();
+  for (const s of steps) s.addEventListener("click", () => { framework.currentTime = +s.dataset.t; framework.play(); });
 
   // Copy the BibTeX entry; if the clipboard is unavailable, select it so the user can copy by hand.
   document.getElementById("copy-bibtex").addEventListener("click", async (e) => {
