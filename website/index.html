@@ -132,7 +132,7 @@
       cannot decide how much sample mass each component should receive.</div>
   </div>
   <figure>
-    <img src="assets/masem-dso26.svg" alt="Illustration of the sampling problem: local sampler chains move along an implicitly defined manifold.">
+    <img src="assets/masem-dso26-disconnected.svg" alt="Illustration of the sampling problem: local sampler chains move along an implicitly defined manifold.">
   </figure>
 </div>
 <p>MASEM solves this by adding an entropy-maximizing resampling step to any local constrained sampler:</p>
@@ -225,7 +225,7 @@ Without ground-truth samples, we report the feasible entropy and the entropy ove
 MASEM reaches the highest feasible entropy and covers more homotopy classes, i.e. more distinct
 routes through the obstacles.</p>
 <figure class="wide">
-  <img class="plot" src="assets/results/motion_planning_rand_2d_samples.svg" alt="50 sampled trajectories per method on the random-obstacle motion planning problem.">
+  <img class="plot" src="assets/results/masem-mp-rand.svg" alt="50 sampled trajectories per method on the random-obstacle motion planning problem.">
   <figcaption><strong>Random obstacles, 50 samples per method.</strong> MASEM-based approaches yield the
   highest sample entropy of all methods.</figcaption>
 </figure>
