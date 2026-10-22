@@ -3,7 +3,7 @@ defaults:
   - algorithm: nhr
   - _self_
 
-result_dir: logs_rebuttal/${algorithm.name}_${target.name}_${target.dim}D_${seed}
+result_dir: logs/${algorithm.name}_${target.name}_${target.dim}D_${seed}
 project_name: constrained_sampling
 visualize_samples: False
 save_samples: True

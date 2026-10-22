@@ -16,6 +16,7 @@ nhr:
 cluster_nhr:
   cluster_threshold: 0.32
   n_inner: 100
+  mu_slack: 1e3
 
 knn_nhr:
   knn_k: 19
