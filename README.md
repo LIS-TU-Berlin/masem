@@ -19,7 +19,7 @@ We provide implementations of the following samplers:
 ## How to use
 
 ### Configuration
-We use [`hydra`](https://hydra.cc/) for config management. The [base configuration](configs/base_conf.yaml) file sets 
+We use [`hydra`](https://hydra.cc/) for config management. The [base configuration](configs/base_cfg.yaml) file sets 
 parameters that are agnostic to the specific choice of algorithm and target density.
 
 Environment setup:
@@ -35,7 +35,7 @@ uv pip install -e .
 There are 2 types of experiments: experiments for synthetic benchmarks and experiments for robotics benchmarks.
 For synthetic benchmarks you must have ground truth samples stored in `masem/distributions/data` for the scripts to run.
 
-To run the analysis and compute metircs automatically after sampling, use:
+To run the analysis and compute metrics automatically after sampling, use:
 
 ```bash
 python masem/scripts/run_analysis.py algorithm=nhr target=seven_lobes seed=123
@@ -43,10 +43,18 @@ python masem/scripts/run_analysis.py algorithm=nhr target=seven_lobes seed=123
 
 Alternatively you can also comment out the metrics computation in our sampling script.
 
-## Conventions -- TODO: check
-- $\log p(x) \in \mathbb{R}^{b}$ for $x \in \mathbb{R}^{b \times d}$
-- $\nabla \log p(x) \in \mathbb{R}^{b \times d}$ for $x \in \mathbb{R}^{b \times d}$
-- $Jac~g(x) \in \mathbb{R}^{b \times n_c \times d}$ where $n_c$ is the cardinality of consrtaint set
+## Remarks
+
+### Precision
+For all paper experiments we used `float64` precision via the environment variables that are automatically loaded from `.env`.
+If you turn this off, results might differ. 
+In particular, the randomly sampled map for motion planning will differ, but the samplers should work nevertheless.
+
+### Conventions
+We use the following conventions for a batch $x \in \mathbb{R}^{b \times d}$ (for unbatched inputs $x \in \mathbb{R}^{d}$ the leading $b$ is dropped):
+- $\log p(x) \in \mathbb{R}^{b}$ and $\nabla \log p(x) \in \mathbb{R}^{b \times d}$
+- $g(x) \in \mathbb{R}^{b \times m_g}$ and $\text{Jac}~g(x) \in \mathbb{R}^{b \times m_g \times d}$, where $m_g$ is the total number of scalar inequality constraints
+- $h(x) \in \mathbb{R}^{b \times m_h}$ and $\text{Jac}~h(x) \in \mathbb{R}^{b \times m_h \times d}$, where $m_h$ is the total number of scalar equality constraints
 
 ## References
 If you use parts of this codebase in your research, please cite us using the following BibTeX entries.
