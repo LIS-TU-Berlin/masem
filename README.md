@@ -34,14 +34,14 @@ uv pip install -e .
 ### Running experiments
 There are 2 types of experiments: experiments for synthetic benchmarks and experiments for robotics benchmarks.
 For synthetic benchmarks you must have ground truth samples stored in `masem/distributions/data` for the scripts to run.
-We provide this data on [TBD](). 
-Alternatively you can regenerate it using the `main()` in the corresponding files.
 
 To run the analysis and compute metircs automatically after sampling, use:
 
 ```bash
 python masem/scripts/run_analysis.py algorithm=nhr target=seven_lobes seed=123
 ```
+
+Alternatively you can also comment out the metrics computation in our sampling script.
 
 ## Conventions -- TODO: check
 - $\log p(x) \in \mathbb{R}^{b}$ for $x \in \mathbb{R}^{b \times d}$

@@ -1,7 +1,7 @@
 name: knn_nhr
 
 fn:
-  _target_: masem.samplers.knn_nhr.KnnNhr
+  _target_: masem.samplers.masem_nhr.MasemNHR
   n_chains: ${eval_samples}
   n_down: ${target.nhr.n_down}
   max_ls_iters: ${target.nhr.max_ls_iters}
