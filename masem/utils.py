@@ -34,6 +34,9 @@ def safe_norm(
 
     From:
     https://github.com/google-deepmind/optax/blob/main/optax/_src/numerics.py#L48#L83
+    Copyright 2021 DeepMind Technologies Limited, licensed under the Apache
+    License 2.0 (see THIRD_PARTY_NOTICES.md). Modified: renamed `ord` to
+    `norm_ord` and added a default for `min_norm`.
 
     The gradients of `jnp.maximum(jnp.linalg.norm(x), min_norm)` at 0.0 is `NaN`,
     because jax will evaluate both branches of the `jnp.maximum`. This function

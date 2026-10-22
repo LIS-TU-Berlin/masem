@@ -31,10 +31,9 @@ class ScmcState:
 
 
 class SoftSCMC(Sampler):
-    r"""SCMC implementation for Golchi et al (2016).
-
-    Based on their R code:
-    https://github.com/sgolchi/SCMC-/blob/master/SCMC.R
+    r"""SCMC implementation of the algorithm from Golchi & Campbell (2016),
+    "Sequentially Constrained Monte Carlo", Computational Statistics & Data
+    Analysis 97, 98-113. https://doi.org/10.1016/j.csda.2015.11.013
 
     NOTE: this implementation follows the convention of
             p(x) \propto f(x)*slack(x)/mu

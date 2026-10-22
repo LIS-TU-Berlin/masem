@@ -94,13 +94,12 @@
   .legend svg { width: 30px; height: 10px; }
   figure.wide { margin-bottom: 16px; }
   figure.teaser { margin-bottom: 44px; }
-  figure.wide img { width: 100%; height: auto; display: block; border-radius: 10px; background: var(--card); border: 1px solid var(--line); }
-  figure.wide img.plot { padding: 14px 10px 8px; }
-  figure.wide img.samples { padding: 14px; }
-  .with-samples { display: grid; gap: 12px; grid-template-columns: 1fr 3.4fr; align-items: center; }
+  figure.teaser img { width: 100%; height: auto; display: block; border-radius: 10px; background: var(--card); border: 1px solid var(--line); }
+  figure.box, .plot-grid figure { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px; }
+  figure.box img { width: 100%; height: auto; display: block; }
+  figure.box figcaption, .plot-grid figcaption { margin-top: 6px; padding: 0 4px; }
+  .with-samples { display: grid; gap: 12px; grid-template-columns: 1fr 4.5fr; align-items: center; }
   .plot-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); margin-bottom: 16px; }
-  .plot-grid figure { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px; }
-  .plot-grid figcaption { margin-top: 6px; padding: 0 4px; }
   .pair { display: grid; gap: 8px; grid-template-columns: 1fr 1fr; }
   .pair img { width: 100%; height: auto; display: block; }
 
@@ -239,7 +238,7 @@ distance that is an order of magnitude lower, without increasing constraint viol
   <span><svg viewBox="0 0 30 10" aria-hidden="true"><line x1="1" y1="5" x2="29" y2="5" stroke="#d4324a" stroke-width="2.2"/></svg><b>MASEM-NHR (ours)</b></span>
   <span><svg viewBox="0 0 30 10" aria-hidden="true"><line x1="1" y1="5" x2="29" y2="5" stroke="#800080" stroke-width="2.2"/></svg><b>MASEM-OLLA (ours)</b></span>
 </div>
-<figure class="wide">
+<figure class="wide box">
   <div class="scroll-x"><div class="with-samples">
     <img class="samples" src="assets/results/samples_uniform_ball2_disconnected.png" alt="MASEM-NHR samples on the disconnected disks benchmark.">
     <img class="plot" src="assets/results/convergence_uniform_ball2_disconnected.svg" alt="Sinkhorn distance, KL divergence and constraint violations over 5000 iterations on the disconnected disks benchmark.">
@@ -247,7 +246,7 @@ distance that is an order of magnitude lower, without increasing constraint viol
   <figcaption><strong>Disconnected disks.</strong> MASEM-NHR samples, and Sinkhorn distance \(\mathcal{W}_2^2\), KL divergence and
   constraint violations over 5000 iterations.</figcaption>
 </figure>
-<figure class="wide">
+<figure class="wide box">
   <div class="scroll-x"><div class="with-samples">
     <img class="samples" src="assets/results/samples_sine.png" alt="MASEM-NHR samples on the sine benchmark.">
     <img class="plot" src="assets/results/convergence_sine.svg" alt="Sinkhorn distance, KL divergence and constraint violations over 5000 iterations on the sine benchmark.">
@@ -283,15 +282,15 @@ distance as the dimension \(d\) grows. It also stays competitive in wallclock ti
 Without ground-truth samples, we report the feasible entropy and the entropy over homotopy classes:
 MASEM reaches the highest feasible entropy and covers more homotopy classes, i.e. more distinct
 routes through the obstacles.</p>
-<figure class="wide">
+<figure class="wide box">
   <div class="scroll-x"><img class="plot" src="assets/results/masem-mp-rand.svg" alt="50 sampled trajectories per method on the random-obstacle motion planning problem."></div>
-  <figcaption><strong>Random obstacles, 50 samples per method.</strong> MASEM-based approaches yield the
+  <figcaption><strong>Random obstacles</strong> Qualitative Plots, 50 samples per method. MASEM-based approaches yield the
   highest sample entropy of all methods.</figcaption>
 </figure>
 <div class="legend" aria-label="Legend"></div>
-<figure class="wide">
+<figure class="wide box">
   <div class="scroll-x"><img class="plot" src="assets/results/convergence_motion_planning_rand.svg" alt="Feasible entropy, homotopy entropy, constraint violations and wallclock over iterations on the random-obstacle motion planning problem."></div>
-  <figcaption><strong>Random obstacles</strong> (9 dimensions, 934 constraints). Feasible entropy, homotopy-class entropy,
+  <figcaption><strong>Random obstacles</strong> Feasible entropy, homotopy-class entropy,
   constraint violation and wallclock time.</figcaption>
 </figure>
 
