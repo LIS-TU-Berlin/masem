@@ -30,13 +30,13 @@ soft_scmc:
 knn_nhr:
   knn_k: 20
   knn_tau: 0.74
-  n_inner: 20
+  n_inner: 10
   mu_slack: ${eval:'${target.mu}/${target.dim}'}
 
 knn_olla:
   knn_k: 20
   knn_tau: 0.74
-  n_inner: 20
+  n_inner: 10
   max_step: 1.e3
   mu_slack: ${eval:'${target.mu}/${target.dim}'}
 

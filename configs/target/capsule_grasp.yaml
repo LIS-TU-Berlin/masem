@@ -21,6 +21,7 @@ knn_nhr:
   knn_k: 19
   knn_tau: 0.41
   n_inner: 5
+  mu_slack: ${target.nhr.mu_slack}
 
 olla:
   step_size: 0.00043582
@@ -31,6 +32,8 @@ knn_olla:
   knn_k: 16
   knn_tau: 0.94
   n_inner: 10
+  max_step: ${target.nhr.max_step}
+  mu_slack: ${target.nhr.mu_slack}
 
 soft_scmc:
   steps_per_level: 10
