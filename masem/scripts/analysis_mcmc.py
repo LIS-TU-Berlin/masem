@@ -141,7 +141,7 @@ def sample_mcmc(cfg: OmegaConf):
         if allow_final_mixing:
             final_metrics = metrics_fn(rng, sampler.get_samples(state)[None], dist)
             for k, v in final_metrics.items():
-                wandb.run.summary["eval/"+k+"_am"] = float(v)
+                wandb.run.summary["eval/"+k+"_am"] = float(v[0])  # v has shape (1,) from the [None] batch
 
         wandb.finish()
 

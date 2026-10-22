@@ -14,7 +14,6 @@ import wandb
 from omegaconf import OmegaConf
 from tqdm import tqdm
 
-from masem.distributions.capsule_grasp.capsule_grasp import CapsuleGrasp
 from masem.constants import REPO_PATH
 from masem.scripts.analysis_mcmc import setup
 from masem.utils import linear_project, reset_device_memory
@@ -156,18 +155,13 @@ def resample_mcmc(cfg: OmegaConf):
         if allow_final_mixing:
             final_metrics = metrics_fn(rng, sampler.get_samples(state)[None], dist)
             for k, v in final_metrics.items():
-                wandb.run.summary["eval/"+k+"_am"] = float(v)
+                wandb.run.summary["eval/"+k+"_am"] = float(v[0])  # v has shape (1,) from the [None] batch
 
         # get auc for hparam tuning
         if "sd_proj" in metrics:
             auc = onp.trapezoid(metrics["sd_proj"], iters)
             norm_auc = auc / (iters[-1] - iters[0])
             wandb.run.summary["eval/sd_norm_auc"] = float(norm_auc)
-
-        if type(dist) == CapsuleGrasp:
-            auc = onp.trapezoid(metrics["n_working_fraction_max_diff"], iters)
-            norm_auc = auc / (iters[-1] - iters[0])
-            wandb.run.summary["eval/working_frac_maxdiff_norm_auc"] = float(norm_auc)
 
         wandb.finish()
 

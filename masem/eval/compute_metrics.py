@@ -6,7 +6,6 @@ from tqdm import tqdm
 
 from masem.constants import FEAS_THRESH
 from masem.distributions.constrained_dist import ConstrainedDistribution
-from masem.eval.grasp_metrics import approx_feasible_pos_entropy
 from masem.eval.mp_metrics import grid_coverage, path_ht_entropy, trajectory_entropy
 from masem.eval.performance_metrics import (
     approx_entropy,
@@ -221,36 +220,6 @@ def compute_metrics_motion_plan(
                 metrics[f"ess_{k}" + suffix][i] = ess[j]
                 metrics[f"ess_raw_{k}" + suffix][i] = ess_raw[j]
                 metrics[f"ess_w_{k}" + suffix][i] = ess_w[j]
-
-    return metrics
-
-
-def compute_metrics_blockstacks(
-    rng: PRNGKey,
-    steps: Array,   # x samples
-    dist: ConstrainedDistribution,
-    n_gt: int = 2_000,
-    feas_tol: float = FEAS_THRESH,
-) -> dict:
-    n_steps = steps.shape[0]
-    suffixes = ["_raw", "_proj"]
-    metrics = {
-        k + s: onp.empty(n_steps) for k in
-        ("n_feas", "slack", "entropy", "feasible_entropy", "feasible_pos_entropy") for s in suffixes
-    }
-
-    rngs = jax.random.split(rng, n_steps + 1)
-
-    for i in tqdm(range(n_steps), colour="blue", desc="Computing Metrics"):
-        x_raw = steps[i]
-        x_proj = linear_project(dist, x_raw)
-
-        for suffix, x in (("_raw", x_raw), ("_proj", x_proj)):
-            metrics["n_feas" + suffix][i] = dist.feasible(x, tol=feas_tol).sum()
-            metrics["slack" + suffix][i] = constraint_violations(dist, x)
-            metrics["entropy" + suffix][i] = approx_entropy(rngs[i], x)
-            metrics["feasible_entropy" + suffix][i] = approx_feasible_entropy(rngs[i], x, dist, tol=feas_tol)
-            metrics["feasible_pos_entropy" + suffix][i] = approx_feasible_pos_entropy(rngs[i], x, dist, tol=feas_tol)
 
     return metrics
 
