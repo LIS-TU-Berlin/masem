@@ -1,0 +1,46 @@
+name: capsule_grasp
+dim: 18
+has_entropy: False
+
+fn:
+  _target_: masem.distributions.capsule_grasp.capsule_grasp.CapsuleGrasp
+  dim: ${target.dim}
+
+# algorithm-specific hyperparams
+nhr:
+  n_down: 500
+  max_step: 5.4
+  max_ls_iters: 4
+  mu_slack: 1e3
+
+cluster_nhr:
+  cluster_threshold: 0.32
+  n_inner: 100
+  mu_slack: 1e3
+
+knn_nhr:
+  knn_k: 19
+  knn_tau: 0.41
+  n_inner: 5
+  mu_slack: ${target.nhr.mu_slack}
+
+olla:
+  step_size: 0.00043582
+  alpha: 1751.70062
+  n_hutch_samples: 0
+
+knn_olla:
+  knn_k: 16
+  knn_tau: 0.94
+  n_inner: 10
+  max_step: ${target.nhr.max_step}
+  mu_slack: ${target.nhr.mu_slack}
+
+soft_scmc:
+  steps_per_level: 10
+  ess_target: 0.75
+  mu_min: 0.001945
+
+all:
+  max_ls_iters: 2
+  initial_scale: 1.

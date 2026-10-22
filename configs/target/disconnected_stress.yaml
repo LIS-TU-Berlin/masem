@@ -1,0 +1,46 @@
+name: disconnected_stress
+dim: 200
+has_entropy: False
+
+mu: 1e3
+
+fn:
+  _target_: masem.distributions.constrained.disconnected_stresstest.DisconnectedStress
+  dim: ${target.dim}
+  n_eq: 5
+  n_ineq: 5
+  n_components: 5
+
+nhr:
+  n_down: 500
+  max_step: 745.66
+  max_ls_iters: 1
+  mu_slack: ${eval:'1e3/${target.dim}'}
+
+olla:
+  step_size: 5.e-4
+  alpha: 2000.00
+  n_hutch_samples: 0
+
+soft_scmc:
+  steps_per_level: 5
+  ess_target: 0.25
+  mu_min: 0.004
+
+knn_nhr:
+  knn_k: 20
+  knn_tau: 0.74
+  n_inner: 10
+  mu_slack: ${eval:'${target.mu}/${target.dim}'}
+
+knn_olla:
+  knn_k: 20
+  knn_tau: 0.74
+  n_inner: 10
+  max_step: 1.e3
+  mu_slack: ${eval:'${target.mu}/${target.dim}'}
+
+cluster_nhr:
+  cluster_threshold: 0.892
+  n_inner: 10
+  mu_slack: ${eval:'1e3/${target.dim}'}

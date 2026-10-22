@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manifold Sampling via Entropy Maximization</title>
+<meta name="description" content="MASEM: uniform sampling on manifolds with disconnected components via k-nearest-neighbor entropy maximization.">
+<meta property="og:title" content="Manifold Sampling via Entropy Maximization">
+<meta property="og:description" content="MASEM: uniform sampling on manifolds with disconnected components via k-nearest-neighbor entropy maximization.">
+<meta property="og:image" content="assets/2d_rows_transposed.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {delimiters: [{left: '\\[', right: '\\]', display: true}, {left: '\\(', right: '\\)', display: false}]})"></script>
+<style>
+  /* Single mobile breakpoint: 700px (see the media query at the end). */
+  :root {
+    --bg: #fbfbf9; --fg: #1d2126; --muted: #5d6670; --line: #e3e5e1;
+    --card: #ffffff; --accent: #2688c9; --accent-ink: #1b6aa0;
+    --tint: #eaf3fb; --tint-line: #bcd8ef;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color-scheme: light;
+  }
+
+  /* Base */
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--fg);
+         font: 17px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 48px 20px 80px; }
+  h1 { font-size: clamp(1.7rem, 4vw, 2.5rem); line-height: 1.15; margin: 0 0 14px; letter-spacing: -0.01em; }
+  h2 { font-size: 1.35rem; margin: 48px 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+  h3 { font-size: 1.08rem; margin: 30px 0 8px; }
+  p { margin: 0 0 14px; }
+  p a { color: var(--accent-ink); }
+  code { font-family: var(--mono); font-size: .9em; }
+  figure { margin: 0; }
+  figcaption { color: var(--muted); font-size: .9rem; margin-top: 10px; }
+  .lead { font-size: 1.05rem; }
+  .note { color: var(--muted); font-size: .9rem; }
+  .scroll-x { overflow-x: auto; }
+  .mobile-only { display: none; }
+  .katex { font-size: 1.08em; }
+
+  /* Header */
+  header { text-align: center; margin-bottom: 40px; }
+  .authors { font-size: 1.05rem; margin: 0 0 4px; }
+  .affil { color: var(--muted); font-size: .95rem; margin: 0 0 18px; }
+  .links { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .links + .links { margin-top: 10px; }
+  .links a { display: inline-block; padding: 8px 16px; border-radius: 999px; border: 1px solid var(--line);
+             background: var(--card); color: var(--fg); text-decoration: none; font-size: .95rem; }
+  .links a:hover { border-color: var(--accent); color: var(--accent-ink); }
+  .links a.ext::after { content: ""; display: inline-block; width: .8em; height: .8em; margin-left: 6px;
+                        vertical-align: -.05em; background: url(assets/external-link.svg) center / contain no-repeat; }
+
+  /* Method */
+  .problem-row { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; align-items: center; margin: 24px 0 40px; }
+  .problem-row img, .problem-row video { width: 100%; height: auto; display: block; }
+  .problem-row video { border-radius: 10px; border: 1px solid var(--line); background: var(--card); }
+  .problem-row .problem { display: flex; flex-direction: column; gap: 12px; margin: 0; }
+  .problem .eq { margin: 8px 0 2px; }
+  .problem .note { margin: 0; }
+  .step { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; font-size: .95rem; }
+  .step b { color: var(--accent-ink); display: block; margin-bottom: 4px; }
+  .step[data-t] { cursor: pointer; transition: border-color .2s, background .2s; }
+  .step[data-t].active { border-color: var(--accent); background: var(--tint); }
+  .repeat { display: flex; flex-direction: column; gap: 10px; padding: 10px; border: 1px dashed var(--accent); border-radius: 10px; }
+  .repeat-label { background: var(--tint); border: 1px solid var(--tint-line); border-radius: 10px; padding: 6px 14px;
+                  text-align: center; font-weight: 700; color: var(--accent-ink); }
+  .eq { font-size: .9rem; background: var(--card); border: 1px solid var(--line);
+        border-radius: 10px; padding: 12px 14px; overflow-x: auto; margin: 10px 0 16px; }
+  .theorem { background: var(--tint); border: 1px solid var(--tint-line); border-left: 4px solid var(--accent);
+             border-radius: 10px; padding: 14px 18px 6px; margin: 18px 0 16px; }
+  .theorem-title { font-weight: 700; color: var(--accent-ink); margin-bottom: 6px; }
+  .theorem-eq { text-align: center; margin: 4px 0 10px; overflow-x: auto; overflow-y: hidden; }
+  .theorem-eq .katex-display > .katex { font-size: 1.5em; }
+  .eq .katex-display, .theorem-eq .katex-display { margin: .4em 0; }
+  .theorem-where { color: var(--muted); font-size: .9rem; }
+
+  /* Robotics videos */
+  .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); }
+  .grid figure { background: var(--card); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .grid video { width: 100%; display: block; background: var(--card); aspect-ratio: 16 / 9; object-fit: contain; }
+  .grid figcaption { padding: 9px 12px 11px; margin: 0; }
+  .grid .name { font-weight: 600; color: var(--fg); font-size: .95rem; }
+  .grid .meta { font-size: .78rem; }
+
+  /* Results */
+  .legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; margin: 4px 0 8px;
+            padding: 8px 0; font-size: .85rem; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .legend svg { width: 30px; height: 10px; }
+  figure.wide { margin-bottom: 16px; }
+  figure.teaser { margin-bottom: 44px; }
+  figure.teaser img { width: 100%; height: auto; display: block; border-radius: 10px; background: var(--card); border: 1px solid var(--line); }
+  figure.box, .plot-grid figure { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px; }
+  figure.box img { width: 100%; height: auto; display: block; }
+  figure.box figcaption, .plot-grid figcaption { margin-top: 6px; padding: 0 4px; }
+  .with-samples { display: grid; gap: 12px; grid-template-columns: 1fr 4.5fr; align-items: center; }
+  .plot-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); margin-bottom: 16px; }
+  .pair { display: grid; gap: 8px; grid-template-columns: 1fr 1fr; }
+  .pair img { width: 100%; height: auto; display: block; }
+
+  /* BibTeX and footer */
+  .bibtex { position: relative; margin: 10px 0 16px; }
+  .bibtex pre { margin: 0; font-family: var(--mono); font-size: .85rem; line-height: 1.5; background: var(--card);
+                border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; overflow-x: auto; }
+  .bibtex button { position: absolute; top: 8px; right: 8px; padding: 3px 10px; cursor: pointer; font: inherit;
+                   font-size: .8rem; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); color: var(--muted); }
+  .bibtex button:hover { border-color: var(--accent); color: var(--accent-ink); }
+  footer { margin-top: 56px; color: var(--muted); font-size: .85rem; text-align: center; }
+  footer a { color: var(--accent-ink); }
+
+  @media (max-width: 700px) {
+    .problem-row { grid-template-columns: 1fr; }
+    .problem-row figure { order: -1; }
+    .scroll-x > * { min-width: 640px; }
+    .mobile-only { display: inline; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <h1>Manifold Sampling via Entropy Maximization</h1>
+  <p class="authors">Cornelius&nbsp;V.&nbsp;Braun<sup>*</sup> &middot; Tilman&nbsp;Burghoff<sup>*</sup> &middot; Marc&nbsp;Toussaint</p>
+  <p class="affil">Technische Universit&auml;t Berlin &middot; Robotics Institute Germany<br>
+  <span class="note">NeurIPS 2026 &middot; <sup>*</sup>Equal contribution, authors in alphabetical order</span></p>
+  <nav>
+    <div class="links">
+      <a class="ext" href="https://arxiv.org/abs/2605.12338">Paper</a>
+      <a class="ext" href="https://openreview.net/forum?id=mAVz31YJlN">OpenReview</a>
+      <a class="ext" href="https://github.com/LIS-TU-Berlin/masem">Code</a>
+    </div>
+    <div class="links">
+      <a href="#videos">Videos</a>
+      <a href="#results">Results</a>
+      <a href="#bibtex">BibTeX</a>
+    </div>
+  </nav>
+</header>
+
+<figure class="wide teaser">
+  <img src="assets/2d_rows_transposed.png" alt="Samples from MASEM-NHR (top row) and ground truth (bottom row) on five 2D benchmarks: connected disks, disconnected disks, seven lobes, sine and swiss roll.">
+  <figcaption><strong>MASEM-NHR vs. ground truth on 2D benchmarks.</strong> Black lines show equality
+  constraints, green shaded areas the feasible region of the inequality constraints. MASEM allocates
+  sample mass uniformly across disconnected components and along high-curvature manifolds.</figcaption>
+</figure>
+
+<section>
+  <p class="lead">Sampling from distributions on implicitly defined manifolds: prior work assumes that the feasible set is connected, but in practice it often decomposes into multiple disconnected components. We propose
+  <strong>MAnifold Sampling via Entropy Maximization (MASEM)</strong> which uses a resampling scheme that maximizes the entropy of the empirical distribution based on \(k\)-nearest-neighbor density estimation, and improves over alternatives by an order of
+  magnitude in Sinkhorn distance with competitive runtime.</p>
+</section>
+
+<h2 id="method">Method</h2>
+<div class="problem-row">
+  <div class="problem">
+    <div class="step"><b>Goal</b> Sample uniformly from a manifold that is only defined implicitly by
+      constraints, which can be evaluated point-wise:
+      <div class="eq">\[\Sigma := \{\, x \in \mathbb{R}^d \mid h(x) = 0,\ g(x) \le 0 \,\}\]</div></div>
+    <div class="step"><b>Challenge</b> The manifold may be disconnected, with an unknown number of
+      components. Local MCMC kernels cannot cross the infeasible gaps between components, so they
+      cannot decide how much sample mass each component should receive.</div>
+  </div>
+  <figure>
+    <img src="assets/masem-dso26-disconnected.svg" alt="Illustration of the sampling problem: local sampler chains move along an implicitly defined manifold.">
+  </figure>
+</div>
+<p>MASEM solves this by adding an entropy-maximizing resampling step to any local constrained sampler:</p>
+<div class="problem-row">
+  <div class="problem">
+    <div class="step" data-t="0"><b>1 &middot; Project</b> Random initial samples are projected onto the manifold
+      with Gauss-Newton steps on the squared constraint violation.</div>
+    <div class="step" data-t="1.5"><b>2 &middot; Mix</b> A local constrained MCMC kernel, e.g. non-linear
+      Hit-and-Run (NHR) or OLLA, mixes the samples within each component.</div>
+    <div class="repeat">
+      <div class="repeat-label">&#8635; Repeat</div>
+      <div class="step" data-t="4.9"><b>3a &middot; Resample</b> A \(k\)-nearest-neighbor estimate of the sample density
+        gives samples in under-represented regions higher weights. Resampling by these weights moves
+        mass toward a uniform allocation across components.</div>
+      <div class="step" data-t="8.2"><b>3b &middot; Mix</b> The local kernel mixes the resampled samples within
+        each component again.</div>
+    </div>
+  </div>
+  <figure>
+    <video id="framework" src="assets/masem-framework.mp4" autoplay loop muted playsinline aria-label="Animation of MASEM on two disconnected disks: samples are projected onto the manifold, mixed with a local kernel, then repeatedly resampled by kNN distance and mixed again until both components are covered uniformly."></video>
+  </figure>
+</div>
+<div class="theorem">
+  <div class="theorem-title">Theorem (simplified)</div>
+  <p>Assume the feasible set \(\Sigma\) splits into finitely many connected components and the local sampler
+  mixes well within each component. Then, in the mean-field limit, every MASEM resampling step pulls
+  the per-component sample mass \(\alpha_t\) toward the uniform (maximum-entropy) allocation \(\alpha^*\):</p>
+  <div class="theorem-eq">\[D_{\mathrm{KL}}\big(p_{\alpha_t} \,\|\, p_{\alpha^*}\big) \le C_0 \Big(1 - \frac{\tau}{p}\Big)^{2t}\]</div>
+  <p class="theorem-where">\(\tau \in (0, p)\): resampling temperature &middot; \(p\): intrinsic dimension of the manifold &middot;
+  \(t\): number of resampling steps.<br>Reaching \(D_{\mathrm{KL}} \le \varepsilon\) takes
+  \(\mathcal{O}\big((\log(1/\varepsilon) + \log\log N)/\tau\big)\) steps in the worst case, for \(N\) particles.</p>
+</div>
+<p>The resampling step is modular and adds only a small runtime overhead to the underlying sampler.</p>
+
+<h2 id="videos">Robotics samples</h2>
+<p class="note">Feasible samples drawn with MASEM on robotics problems.</p>
+<div class="grid">
+  <figure>
+    <video src="assets/grasps.mp4" autoplay loop muted playsinline controls preload="metadata"></video>
+    <figcaption><div class="name">Grasp poses</div><div class="meta">robot arm grasp configurations</div></figcaption>
+  </figure>
+  <figure>
+    <video src="assets/paths.mp4" autoplay loop muted playsinline controls preload="metadata"></video>
+    <figcaption><div class="name">Motion paths</div><div class="meta">end-effector paths through an obstacle course</div></figcaption>
+  </figure>
+  <figure>
+    <video src="assets/mppi_24_front.mp4" autoplay loop muted playsinline controls preload="metadata"></video>
+    <figcaption><div class="name">Humanoid poses</div><div class="meta">stable humanoid handstand configurations</div></figcaption>
+  </figure>
+  <figure>
+    <video src="assets/twister.mp4" autoplay loop muted playsinline controls preload="metadata"></video>
+    <figcaption><div class="name">Twister</div><div class="meta">multi-limb contact configurations on a Twister mat</div></figcaption>
+  </figure>
+</div>
+
+<h2 id="results">Results</h2>
+<p class="note">All curves show the mean and 95% confidence interval across seeds.<span class="mobile-only"> Swipe wide figures sideways to see all panels.</span></p>
+
+<h3>Strong sampling at low cost</h3>
+<p>Local samplers like NHR and OLLA cannot move mass between disconnected components, so they stall at
+a high Sinkhorn distance. Once resampling starts, MASEM rebalances the components and converges to a
+distance that is an order of magnitude lower, without increasing constraint violation.</p>
+<div class="legend" id="legend" aria-label="Legend">
+  <span><svg viewBox="0 0 30 10" aria-hidden="true"><line x1="1" y1="5" x2="29" y2="5" stroke="#d4324a" stroke-width="2.2" stroke-dasharray="1.5 2.5"/></svg>NHR</span>
+  <span><svg viewBox="0 0 30 10" aria-hidden="true"><line x1="1" y1="5" x2="29" y2="5" stroke="#800080" stroke-width="2.2" stroke-dasharray="1.5 2.5"/></svg>OLLA</span>
+  <span><svg viewBox="0 0 30 10" aria-hidden="true"><line x1="1" y1="5" x2="29" y2="5" stroke="#2279b5" stroke-width="2.2" stroke-dasharray="8 2.5 1.5 2.5"/></svg>SCMC</span>
+  <span><svg viewBox="0 0 30 10" aria-hidden="true"><line x1="1" y1="5" x2="29" y2="5" stroke="#8c564b" stroke-width="2.2" stroke-dasharray="8 2.5 1.5 2.5"/></svg>Cluster-NHR</span>
+  <span><svg viewBox="0 0 30 10" aria-hidden="true"><line x1="1" y1="5" x2="29" y2="5" stroke="#d4324a" stroke-width="2.2"/></svg><b>MASEM-NHR (ours)</b></span>
+  <span><svg viewBox="0 0 30 10" aria-hidden="true"><line x1="1" y1="5" x2="29" y2="5" stroke="#800080" stroke-width="2.2"/></svg><b>MASEM-OLLA (ours)</b></span>
+</div>
+<figure class="wide box">
+  <div class="scroll-x"><div class="with-samples">
+    <img class="samples" src="assets/results/samples_uniform_ball2_disconnected.png" alt="MASEM-NHR samples on the disconnected disks benchmark.">
+    <img class="plot" src="assets/results/convergence_uniform_ball2_disconnected.svg" alt="Sinkhorn distance, KL divergence and constraint violations over 5000 iterations on the disconnected disks benchmark.">
+  </div></div>
+  <figcaption><strong>Disconnected disks.</strong> MASEM-NHR samples, and Sinkhorn distance \(\mathcal{W}_2^2\), KL divergence and
+  constraint violations over 5000 iterations.</figcaption>
+</figure>
+<figure class="wide box">
+  <div class="scroll-x"><div class="with-samples">
+    <img class="samples" src="assets/results/samples_sine.png" alt="MASEM-NHR samples on the sine benchmark.">
+    <img class="plot" src="assets/results/convergence_sine.svg" alt="Sinkhorn distance, KL divergence and constraint violations over 5000 iterations on the sine benchmark.">
+  </div></div>
+  <figcaption><strong>Sine.</strong> MASEM-NHR samples, and Sinkhorn distance \(\mathcal{W}_2^2\), KL divergence and
+  constraint violations over 5000 iterations.</figcaption>
+</figure>
+
+<h3>Scaling with dimension</h3>
+<p>On a stress test with five disconnected components, MASEM achieves the lowest Sinkhorn
+distance as the dimension \(d\) grows. It also stays competitive in wallclock time with the baselines.</p>
+<div class="legend" aria-label="Legend"></div>
+<div class="plot-grid">
+  <figure>
+    <div class="pair">
+      <img src="assets/results/disconnected_stress_2d_sd_proj.svg" alt="Sinkhorn distance versus ambient dimension with a fixed 2D manifold.">
+      <img src="assets/results/disconnected_stress_2d_wallclock.svg" alt="Wallclock time versus ambient dimension with a fixed 2D manifold.">
+    </div>
+    <figcaption><strong>Increasing ambient dimension.</strong> The manifold dimension is fixed to 2 while \(d\)
+    grows. The gap between MASEM and the baselines stays constant.</figcaption>
+  </figure>
+  <figure>
+    <div class="pair">
+      <img src="assets/results/disconnected_stress_sd_proj.svg" alt="Sinkhorn distance versus dimension with an increasing manifold dimension.">
+      <img src="assets/results/disconnected_stress_wallclock.svg" alt="Wallclock time versus dimension with an increasing manifold dimension.">
+    </div>
+    <figcaption><strong>Increasing manifold dimension.</strong> Using an intrinsic manifold dimension of \(d-5\), MASEM outperforms NHR, OLLA and Cluster-NHR by an order of magnitude.</figcaption>
+  </figure>
+</div>
+
+<h3>Robotics: motion planning with random obstacles</h3>
+<p>We sample constraint-satisfying spline trajectories for a 2D point mass through a course of 20 randomly placed obstacles.
+Without ground-truth samples, we report the feasible entropy and the entropy over homotopy classes:
+MASEM reaches the highest feasible entropy and covers more homotopy classes, i.e. more distinct
+routes through the obstacles.</p>
+<figure class="wide box">
+  <div class="scroll-x"><img class="plot" src="assets/results/masem-mp-rand.svg" alt="50 sampled trajectories per method on the random-obstacle motion planning problem."></div>
+  <figcaption><strong>Random obstacles</strong> Qualitative Plots, 50 samples per method. MASEM-based approaches yield the
+  highest sample entropy of all methods.</figcaption>
+</figure>
+<div class="legend" aria-label="Legend"></div>
+<figure class="wide box">
+  <div class="scroll-x"><img class="plot" src="assets/results/convergence_motion_planning_rand.svg" alt="Feasible entropy, homotopy entropy, constraint violations and wallclock over iterations on the random-obstacle motion planning problem."></div>
+  <figcaption><strong>Random obstacles</strong> Feasible entropy, homotopy-class entropy,
+  constraint violation and wallclock time.</figcaption>
+</figure>
+
+<h2 id="paper">Paper</h2>
+<p><a href="https://arxiv.org/abs/2605.12338">Manifold Sampling via Entropy Maximization</a>.
+Cornelius V. Braun, Tilman Burghoff, Marc Toussaint. NeurIPS 2026.<br>
+[<a href="https://arxiv.org/pdf/2605.12338">PDF</a>] [<a href="https://openreview.net/forum?id=mAVz31YJlN">OpenReview</a>]</p>
+<p id="bibtex">If you find this work useful, please cite:</p>
+<div class="bibtex">
+  <button type="button" id="copy-bibtex">Copy</button>
+<pre><code id="bibtex-text">@inproceedings{braun2026manifold,
+  title={Manifold Sampling via Entropy Maximization},
+  author={Cornelius V. Braun and Tilman Burghoff and Marc Toussaint},
+  booktitle={The Fortieth Annual Conference on Neural Information Processing Systems},
+  year={2026},
+  url={https://openreview.net/forum?id=mAVz31YJlN}
+}</code></pre>
+</div>
+
+<h2 id="code">Code</h2>
+<p>The code is available at <a href="https://github.com/LIS-TU-Berlin/masem">github.com/LIS-TU-Berlin/masem</a>.</p>
+
+<footer>Manifold Sampling via Entropy Maximization &middot; project page<br>
+Website design adapted from the <a href="https://denisbless.github.io/FFM_website/">FFM project page</a>.</footer>
+</main>
+
+<script>
+  // The legend is written out once; copy it into the other (empty) legend slots.
+  const legend = document.getElementById("legend");
+  for (const el of document.querySelectorAll(".legend:empty")) el.innerHTML = legend.innerHTML;
+
+  // Highlight the method step the framework animation is currently showing; clicking a step seeks to it.
+  const framework = document.getElementById("framework");
+  const steps = [...document.querySelectorAll(".step[data-t]")];
+  function syncSteps() {
+    const cur = steps.findLast(s => framework.currentTime >= +s.dataset.t);
+    for (const s of steps) s.classList.toggle("active", s === cur);
+  }
+  framework.addEventListener("timeupdate", syncSteps);
+  syncSteps();
+  for (const s of steps) s.addEventListener("click", () => { framework.currentTime = +s.dataset.t; framework.play(); });
+
+  // Copy the BibTeX entry; if the clipboard is unavailable, select it so the user can copy by hand.
+  document.getElementById("copy-bibtex").addEventListener("click", async (e) => {
+    const btn = e.currentTarget, code = document.getElementById("bibtex-text");
+    try {
+      await navigator.clipboard.writeText(code.textContent);
+      btn.textContent = "Copied";
+    } catch (err) {
+      getSelection().selectAllChildren(code);
+      btn.textContent = "Selected";
+    }
+    setTimeout(() => { btn.textContent = "Copy"; }, 1500);
+  });
+</script>
+</body>
+</html>

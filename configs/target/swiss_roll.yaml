@@ -1,0 +1,40 @@
+name: swiss_roll
+dim: 2
+has_entropy: False
+
+fn:
+  _target_: masem.distributions.constrained.swiss_roll.CircleSwissRoll
+
+nhr:
+  n_down: 500
+  max_step: 1.11
+  max_ls_iters: 1
+  mu_slack: 1e3
+
+olla:
+  step_size: 5.e-4
+  alpha: 2.e+3
+  n_hutch_samples: 0
+
+soft_scmc:
+  steps_per_level: 5
+  ess_target: 0.75
+  mu_min: 0.006
+
+knn_nhr:
+  knn_k: 16
+  knn_tau: 0.65
+  n_inner: 5
+  mu_slack: 1e3
+
+knn_olla:
+  knn_k: 8
+  knn_tau: 0.5
+  n_inner: 50
+  max_step: null
+  mu_slack: 1e3
+
+cluster_nhr:
+  cluster_threshold: 0.059
+  n_inner: 10
+  mu_slack: 1e3

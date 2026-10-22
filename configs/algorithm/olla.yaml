@@ -1,0 +1,10 @@
+name: olla
+
+fn:
+  _target_: masem.samplers.olla.OLLA
+  n_chains: ${eval_samples}
+  alpha: ${target.olla.alpha}
+  step_size: ${target.olla.step_size}
+  n_hutch_samples: ${target.olla.n_hutch_samples}
+
+n_iter: ${n_iter}
